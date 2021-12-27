@@ -6,7 +6,7 @@ import React from 'react';
 
 //실습코드 3-12. Todo 아이템 리스트 렌더링...
 class App extends React.Component {
-  contstructor(props) {
+  constructor(props) {
     super(props);
     // (1) item -> items 배열로...
     this.state = {
