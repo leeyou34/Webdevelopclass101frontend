@@ -1,14 +1,15 @@
 //실습코드 3-7. Todo 컴포넌트
 //Todo 리스트를 위해 첫번째로 Todo Component를 만든다. 이 컴포넌트는 checkbox와 label을 렌더링 하는 컴포넌트다.
 
-import React from 'react'
+import React from 'react';
+
 //실습코드 3-10. constructor(props){}내에는 Todo 컴포넌트에 item 매개변수 넘기기.
 class Todo extends React.Component {
     constructor(props) {
         super(props);
         this.state = {item: props.item};
       }
-
+      
       
       render() {
         return (
