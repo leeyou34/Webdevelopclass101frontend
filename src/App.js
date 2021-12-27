@@ -3,25 +3,51 @@ import './App.css';
 //실습코드 3-8. App 컴포넌트에서 Todo 컴포넌트 사용하기.
 import Todo from './Todo'; // 실습코드 3-8. todo component를 위해 추가됨.
 import React from 'react';
-//실습코드 3-11. App에서 Todo로 item 넘겨주기
+
+//실습코드 3-12. Todo 아이템 리스트 렌더링...
 class App extends React.Component {
-  constructor(props){
+  contstructor(props) {
     super(props);
+    // (1) item -> items 배열로...
     this.state = {
-      item: {id:0, title: "Hello World 1", done: true },
+      items: [
+        { id: "0", title: "Hello World 1", done: true },
+        { id: "1", title: "Hello World 2", done: false},
+      ],
     };
   }
-
   render() {
-    return (
-      <div className="App">
-        <Todo item={this.state.item}/>
-      </div>
-    );
+    // (2) 자바스크립트가 제공하는 map 함수를 이용해 배열을 반복해 <Todo... / > 컴포넌트 생성.
+    var todoItems = this.state.items.map((item, idx) => (
+      <Todo item={item} key={item.id} />
+    ));
+
+    // (3) 생성된 컴포넌트 리턴
+    return <div className="App">{todoItems}</div>;
   }
 }
-
 export default App;
+
+
+// //실습코드 3-11. App에서 Todo로 item 넘겨주기
+// class App extends React.Component {
+//   constructor(props){
+//     super(props);
+//     this.state = {
+//       item: {id:0, title: "Hello World 1", done: true },
+//     };
+//   }
+
+//   render() {
+//     return (
+//       <div className="App">
+//         <Todo item={this.state.item}/>
+//       </div>
+//     );
+//   }
+// }
+
+// export default App;
 
 
 // //실습코드 3-8을 위한 코드.
