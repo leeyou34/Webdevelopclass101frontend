@@ -4,9 +4,9 @@ import './index.css'; // css import
 import App from './App'; //App component import
 import reportWebVitals from './reportWebVitals'; // 지금은 무시해도 됨
 
-ReactDOM.render( // ReactDOM이 내부의 컴포넌트들을 'root' 엘리멘트에 render함
+ReactDOM.render( // ReactDOM이 내부의 컴포넌트들을 'root' 엘리멘트에 render함 // App Component 사용법
   <React.StrictMode>
-    <App /> // App Component 사용법
+    <App />
   </React.StrictMode>,
   document.getElementById('root')
 );
