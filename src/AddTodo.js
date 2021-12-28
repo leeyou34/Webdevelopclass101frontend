@@ -14,6 +14,35 @@ class AddTodo extends React.Component {
         this.setState({ item: thisItem });
         console.log(thisItem);
     }
+  /*
+  *=================================================
+  * 실습코드 3-19. AddTodo.js에서 add함수 사용.
+  */
+
+    //  (2) 함수 작성 (3-19.)
+    onButtonClick = () => {
+        this.add(this.state.item); // add함수 사용
+        this.setState({ item: { title: ""} });
+    }
+  /* 하기 return () 내에 onClick={this.onButtonClick}과 연결됨.
+  *==================================================
+  */
+
+  /*
+  *=================================================
+  * 실습코드 3-20. AddTodo.js에서 Enter키 처리를 위한 핸들러 작성
+  */
+
+    //  (3) 함수 작성 (3-20.)
+    enterKeyEventHandler = (e) => {
+        if (e.key === 'Enter') {
+            this.onButtonClick();
+        }
+    }
+  /* 하기 onKeyPress={this.enterKeyEventHandler} 랑 연결됨.
+  *==================================================
+  */
+
 
     render() {
     //  (2) 함수 연결
@@ -26,12 +55,14 @@ class AddTodo extends React.Component {
                             fullWidth
                             onChange={this.onInputChange}
                             value={this.state.item.title}
+                            onKeyPress={this.enterKeyEventHandler}
                         />
                     </Grid>
                     <Grid xs={1} md={1} item>
                         <Button fullWidth
                             color="secondary"
-                            variant="outlined">
+                            variant="outlined"
+                            onClick={this.onButtonClick}>
                                 +
                         </Button>
                     </Grid>

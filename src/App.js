@@ -4,7 +4,7 @@ import './App.css';
 import Todo from './Todo'; // 실습코드 3-8. todo component를 위해 추가됨.
 import React from 'react';
 // 실습코드 3-16. App.js에 AddTodo 컴포넌트 추가.
-import AddTodo from './AddTodo';
+import AddTodo from './AddTodo.js';
 import {Paper, List, Container} from "@material-ui/core";
 
 class App extends React.Component {
@@ -17,7 +17,24 @@ class App extends React.Component {
       ],
     };
   }
+  /*
+  *=================================================
+  * Dec 28th 2021
+  * 실습코드 3-18. App.js에서 add함수 추가.
+  */
 
+  //  (1) 함수 추가
+  add = (item) => {
+    const thisItems = this.state.items;
+    item.id = "ID-" + thisItems.length; //key를 위한 id 추가
+    item.done = false; // done 초기화
+    thisItems.push(item); // 리스트에 아이템 추가
+    this.setState({ items: thisItems }); // 업데이트는 반드시 this.setState로 해야됨
+    console.log("items : ", this.state.items);
+  }
+  /*
+  *==================================================
+  */
   render(){
     var todoItems = this.state.items.length > 0 && (
       <Paper style={{ margin: 16}}>
