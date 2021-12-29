@@ -26,7 +26,10 @@ import DeleteOutlined from "@material-ui/icons/DeleteOutlined";
 class Todo extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { item: props.item};
+        this.state = { 
+            item: props.item,
+            readOnly: true // 실습코드 3-30. Todo.js에서 readOnly 상태 변수 추가.
+        };
         /*
         * 실습코드 3-26. Todo.js에서 delete() 함수 연결
         * 함수 연결 시작
@@ -44,6 +47,18 @@ class Todo extends React.Component {
     }
     // 함수 추가 끝.
 
+    /*
+    * 실습코드 3-31. Todo.js에서 offReadOnlyMode() 함수 추가
+    * 함수 추가
+    */
+    offReadOnlyMode = () => {
+        console.log("Event!", this.state.readOnly)
+        this.setState({ readOnly: false}, () => {
+            console.log("ReadOnly? ", this.state.readOnly)
+        });
+    }
+    // 함수 추가 끝.
+
     render() {
         const item = this.state.item;
         return ( 
@@ -51,7 +66,11 @@ class Todo extends React.Component {
                 <Checkbox checked={item.done} /* 실습코드 3-23. disableRipple 추가됨*/ disableRipple/> 
                 <ListItemText>
                     <InputBase
-                        inputProps={{ "aria-label": "naked"}}
+                        inputProps={{ 
+                            "aria-label": "naked",
+                            readOnly: this.state.readOnly, //실습코드 3-32. Todo.js에서 readOnly와 OffReadOnlyMode 연결
+                        }}
+                        onClick={this.offReadOnlyMode}// 실습코드 3-32. Todo.js에서 readOnly와 OffReadOnlyMode 연결
                         type="text"
                         id={item.id}  //각 리스트를 구분하려고 id를 연결
                         name={item.id} // 각 리스트를 구분하려고 id를 연결
