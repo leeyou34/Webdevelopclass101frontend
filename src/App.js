@@ -19,6 +19,7 @@ class App extends React.Component {
       ],
     };
   }
+  //================함수 추가 영역 시작====================================================
   /*
   *=================================================
   * Dec 28th 2021
@@ -59,6 +60,41 @@ class App extends React.Component {
   * 함수 추가 끝.
   *==================================================
   */
+   /*
+  *=================================================
+  * 3.3 서비스 통합
+  * 실습코드 3-39. App 컴포넌트에 componentDidMount() 함수 추가.
+  * 마운팅 과정에서 constructor와 render 함수를 부르는데 마운팅을 마친 후 바로 부르는 함수가 하나더 있다.
+  * 그것이 바로 componentDidMount함수이다.
+  */
+  componentDidMount() {
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    fetch("http://localhost:8080/todo", requestOptions)
+      .then((response) => response.json())
+      .then(
+        (response) => {
+          this.setState({
+            items: response.data,
+          });
+        },
+        (error) => {
+          this.setState({
+            error,
+          });
+        }
+      );
+  }
+  /*
+  * 함수 추가 끝.
+  *==================================================
+  */
+  //===============함수 추가 영역 끝 ===============================
+  //===============렌더 영역 시작===================================
+  
   render(){
     var todoItems = this.state.items.length > 0 && (
       <Paper style={{ margin: 16}}>

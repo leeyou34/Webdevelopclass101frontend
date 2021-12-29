@@ -10,6 +10,9 @@ class AddTodo extends React.Component {
         this.add = props.add; //props의 함수를 this.add에 연결
         // add에 필요한 constructor 추가 끝.
     }
+
+    //===================함수 작성 영역 시작======================================
+    
     //  (1) 함수 작성
     onInputChange = (e) => {
         const thisItem = this.state.item;
@@ -17,24 +20,25 @@ class AddTodo extends React.Component {
         this.setState({ item: thisItem });
         console.log(thisItem);
     }
-  /*
-  *=================================================
-  * 실습코드 3-19. AddTodo.js에서 add함수 사용.
-  */
+
+    /*
+    *=================================================
+    * 실습코드 3-19. AddTodo.js에서 add함수 사용.
+    */
 
     //  (2) 함수 작성 (3-19.)
     onButtonClick = () => {
         this.add(this.state.item); // add함수 사용
         this.setState({ item: { title: ""} });
     }
-  /* 하기 return () 내에 onClick={this.onButtonClick}과 연결됨. add 함수 연결 끝.
-  *==================================================
-  */
+    /* 하기 return () 내에 onClick={this.onButtonClick}과 연결됨. add 함수 연결 끝.
+    *==================================================
+    */
 
-  /*
-  *=================================================
-  * 실습코드 3-20. AddTodo.js에서 Enter키 처리를 위한 핸들러 작성
-  */
+    /*
+    *=================================================
+    * 실습코드 3-20. AddTodo.js에서 Enter키 처리를 위한 핸들러 작성
+    */
 
     //  (3) 함수 작성 (3-20.)
     enterKeyEventHandler = (e) => {
@@ -42,11 +46,13 @@ class AddTodo extends React.Component {
             this.onButtonClick();
         }
     }
-  /* 하기 onKeyPress={this.enterKeyEventHandler} 랑 연결됨. Enter키 함수 연결 끝.
-  *==================================================
-  */
+    /* 하기 onKeyPress={this.enterKeyEventHandler} 랑 연결됨. Enter키 함수 연결 끝.
+    *==================================================
+    */
 
 
+    //===================함수 작성 영역 끝 ===================
+    //===================렌더 영역 시작 =====================
     render() {
     //  (2) 함수 연결
     return (

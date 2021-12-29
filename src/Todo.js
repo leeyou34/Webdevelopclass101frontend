@@ -38,6 +38,7 @@ class Todo extends React.Component {
        // 함수 연결 끝
     }
 
+    //===========함수 추가 영역 시작======================
     /*
     * 실습코드 3-27. Todo.js에서 delete() 함수 추가
     * 함수 추가
@@ -83,11 +84,28 @@ class Todo extends React.Component {
     }
     // 함수 추가 끝.    
 
+    /*
+    * 실습코드 3-37. Todo.js에서 checkBoxEventHandler 작성
+    * 함수 추가
+    */
+
+    checkboxEventHandler = (e) => {
+        const thisItem = this.state.item;
+        thisItem.done = !thisItem.done;
+        this.setState({ item: thisItem });
+    }
+    // 함수 추가 끝.    
+    
+    //==============함수 추가 영역 끝=====================
+    //==============render 영역 시작=====================
     render() {
         const item = this.state.item;
         return ( 
             <ListItem> 
-                <Checkbox checked={item.done} /* 실습코드 3-23. disableRipple 추가됨*/ disableRipple/> 
+                <Checkbox checked={item.done}  
+                          disableRipple /* 실습코드 3-23. disableRipple 추가됨*/
+                          onChange={this.checkboxEventHandler} /* 실습코드 3-38. Todo.js에서 onChange에 checkboxEventHandler 연결 */
+                /> 
                 <ListItemText>
                     <InputBase
                         inputProps={{ 
