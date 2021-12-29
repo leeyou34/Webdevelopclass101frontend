@@ -33,6 +33,28 @@ class App extends React.Component {
     console.log("items : ", this.state.items);
   }
   /*
+  * 함수 추가 끝.
+  *==================================================
+  */
+  /*
+  *=================================================
+  * Dec 29th 2021
+  * 실습코드 3-24. App.js에서 delete() 함수 작성.
+  * 전체 Todo 리스트는 App.js에서 관리하기 때문에 delete() 함수는 App.js에 작성해야 함.
+  */
+
+  //  (2) 함수 추가
+  delete = (item) => {
+    const thisItems = this.state.items;
+      console.log("Before Update Items : ", this.state.items)
+    const newItems = thisItems.filter(e => e.id !== item.id);
+    this.setState({ items: newItems }, () => {
+      //디버깅 콜백
+      console.log("Update Items : ", this.state.items)
+    });
+  }
+  /*
+  * 함수 추가 끝.
   *==================================================
   */
   render(){
@@ -40,7 +62,14 @@ class App extends React.Component {
       <Paper style={{ margin: 16}}>
         <List>
           {this.state.items.map((item, idx) => (
-            <Todo item={item} key={item.id} />
+            <Todo 
+              item={item}
+              key={item.id}
+            /* 실습코드 3-25. App.js Todo의 delete에 연결.
+            * delete 함수 연결
+            */
+              delete={this.delete}  />
+            // delete 함수 연결 끝.
           ))}
         </List>
       </Paper>

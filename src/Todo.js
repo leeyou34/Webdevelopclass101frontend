@@ -27,7 +27,22 @@ class Todo extends React.Component {
     constructor(props) {
         super(props);
         this.state = { item: props.item};
+        /*
+        * 실습코드 3-26. Todo.js에서 delete() 함수 연결
+        * 함수 연결 시작
+        */
+       this.delete = props.delete;
+       // 함수 연결 끝
     }
+
+    /*
+    * 실습코드 3-27. Todo.js에서 delete() 함수 추가
+    * 함수 추가
+    */
+    deleteEventHandler = () => {
+        this.delete(this.state.item)
+    }
+    // 함수 추가 끝.
 
     render() {
         const item = this.state.item;
@@ -46,7 +61,14 @@ class Todo extends React.Component {
                     />
                 </ListItemText>
                 <ListItemSecondaryAction /*실습코드 3-23. DeleteOutlined 추가됨 */>
-                    <IconButton aria-label="Delete Todo">
+                    <IconButton 
+                        aria-label="Delete Todo"
+                        /*
+                        * 실습코드 3-28. Todo.js에서 delete() 함수 작성
+                        * 함수 작성 시작.
+                        */
+                        onClick={this.deleteEventHandler}
+                        /* 함수 작성 끝 */>
                         <DeleteOutlined />
                     </IconButton>
                 </ListItemSecondaryAction>
