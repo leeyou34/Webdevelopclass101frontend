@@ -6,6 +6,9 @@ class AddTodo extends React.Component {
     constructor(props) {
         super(props);
         this.state = { item: { title: "" } };
+        //3-19. AddTodo.js에서 add함수 사용.
+        this.add = props.add; //props의 함수를 this.add에 연결
+        // add에 필요한 constructor 추가 끝.
     }
     //  (1) 함수 작성
     onInputChange = (e) => {
@@ -24,7 +27,7 @@ class AddTodo extends React.Component {
         this.add(this.state.item); // add함수 사용
         this.setState({ item: { title: ""} });
     }
-  /* 하기 return () 내에 onClick={this.onButtonClick}과 연결됨.
+  /* 하기 return () 내에 onClick={this.onButtonClick}과 연결됨. add 함수 연결 끝.
   *==================================================
   */
 
@@ -39,7 +42,7 @@ class AddTodo extends React.Component {
             this.onButtonClick();
         }
     }
-  /* 하기 onKeyPress={this.enterKeyEventHandler} 랑 연결됨.
+  /* 하기 onKeyPress={this.enterKeyEventHandler} 랑 연결됨. Enter키 함수 연결 끝.
   *==================================================
   */
 

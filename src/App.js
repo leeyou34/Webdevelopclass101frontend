@@ -9,11 +9,13 @@ import {Paper, List, Container} from "@material-ui/core";
 
 class App extends React.Component {
   constructor(props) {
-    super(props);
+    super(props); 
     this.state = {
       items: [
-        {id: "0", title: "Hello World 1", done: true},
-        {id: "1", title: "Hello World 2", done: false},
+        // 실습코드 3-29. App.js에서 items를 빈 리스트로 초기화  
+        //{id: "0", title: "Hello World 1", done: true},
+        //{id: "1", title: "Hello World 2", done: false},
+        // add와 delete 라는 기본적인 기능이 있어서 상기 id: "0" blah blah는 주석처리됨.
       ],
     };
   }
@@ -43,7 +45,7 @@ class App extends React.Component {
   * 전체 Todo 리스트는 App.js에서 관리하기 때문에 delete() 함수는 App.js에 작성해야 함.
   */
 
-  //  (2) 함수 추가
+  //  (1) 함수 추가
   delete = (item) => {
     const thisItems = this.state.items;
       console.log("Before Update Items : ", this.state.items)
@@ -68,7 +70,7 @@ class App extends React.Component {
             /* 실습코드 3-25. App.js Todo의 delete에 연결.
             * delete 함수 연결
             */
-              delete={this.delete}  />
+              delete={this.delete}/>
             // delete 함수 연결 끝.
           ))}
         </List>
@@ -78,7 +80,7 @@ class App extends React.Component {
     return (
       <div className="App">
         <Container maxWidth="md">
-          <AddTodo />  
+          <AddTodo add={this.add} /*this add={this.add} section was omitted on 실습코드3-18. add함수 추가 *//>   
           <div className="TodoList">{todoItems}</div>
         </Container>
       </div>
