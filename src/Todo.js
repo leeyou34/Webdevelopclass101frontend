@@ -59,6 +59,30 @@ class Todo extends React.Component {
     }
     // 함수 추가 끝.
 
+    /*
+    * 실습코드 3-33. Todo.js에서 enterKeyEventHandler() 함수 작성
+    * 함수 추가
+    */
+
+    enterKeyEventHandler = (e) => {
+        if (e.key === "Enter") {
+            this.setState({ readOnly: true});
+        }
+    };
+    // 함수 추가 끝.
+
+    /*
+    * 실습코드 3-35. Todo.js에서 editEventHandler() 작성
+    * 함수 추가
+    */
+
+    editEventHandler = (e) => {
+        const thisItem = this.state.item;
+        thisItem.title = e.target.value;
+        this.setState({ item: thisItem });
+    }
+    // 함수 추가 끝.    
+
     render() {
         const item = this.state.item;
         return ( 
@@ -77,6 +101,8 @@ class Todo extends React.Component {
                         value={item.title}
                         multiline={true}
                         fullWidth={true}
+                        onKeyPress={this.enterKeyEventHandler} //실습코드 3-34. Todo.js에서 onKeyPress에 enterKeyEventHandler 연결
+                        onChange={this.editEventHandler} // 실습코드 3-36. Todo.js에서 onChange에 editEventHandler 연결.
                     />
                 </ListItemText>
                 <ListItemSecondaryAction /*실습코드 3-23. DeleteOutlined 추가됨 */>
