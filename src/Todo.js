@@ -36,6 +36,9 @@ class Todo extends React.Component {
         */
        this.delete = props.delete;
        // 함수 연결 끝
+       // 실습코드 3-46. Todo 컴포넌트에서 update 연결 및 사용
+       this.update = props.update; // update를 this.update에 할당함.
+       // 함수 연결 끝
     }
 
     //===========함수 추가 영역 시작======================
@@ -68,6 +71,9 @@ class Todo extends React.Component {
     enterKeyEventHandler = (e) => {
         if (e.key === "Enter") {
             this.setState({ readOnly: true});
+            //실습코드 3-46. update연결 및 사용
+            this.update(this.state.item); //엔터를 누르면 저장
+            // 적용 끝.
         }
     };
     // 함수 추가 끝.
@@ -93,6 +99,8 @@ class Todo extends React.Component {
         const thisItem = this.state.item;
         thisItem.done = !thisItem.done;
         this.setState({ item: thisItem });
+        // 실습코드 3-46. update 연결 및 사용.
+        this.update(this.state.item); // 체크박스가 변경되면 저장.
     }
     // 함수 추가 끝.    
     

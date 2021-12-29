@@ -1,11 +1,11 @@
 //import logo from './logo.svg'; // 12월 27일 잠시 주석처리함... 
 import './App.css';
-//실습코드 3-8. App 컴포넌트에서 Todo 컴포넌트 사용하기.
-import Todo from './Todo'; // 실습코드 3-8. todo component를 위해 추가됨.
+import Todo from './Todo'; // 실습코드 3-8. App 컴포넌트에서 Todo 컴포넌트 사용하기... todo component를 위해 추가됨.
 import React from 'react';
-// 실습코드 3-16. App.js에 AddTodo 컴포넌트 추가.
-import AddTodo from './AddTodo.js';
-import {Paper, List, Container} from "@material-ui/core";
+import AddTodo from './AddTodo.js'; // 실습코드 3-16. App.js에 AddTodo 컴포넌트 추가.
+import {Paper, List, Container} from "@material-ui/core"; // 실습코드 3-16. App.js에 AddTodo 컴포넌트 추가.
+import { call } from "./service/ApiService"; // 실습코드 3-43. App 컴포넌트에서 ApiService 사용
+
 
 class App extends React.Component {
   constructor(props) {
@@ -27,14 +27,14 @@ class App extends React.Component {
   */
 
   //  (1) 함수 추가
-  add = (item) => {
-    const thisItems = this.state.items;
-    item.id = "ID-" + thisItems.length; //key를 위한 id 추가
-    item.done = false; // done 초기화
-    thisItems.push(item); // 리스트에 아이템 추가
-    this.setState({ items: thisItems }); // 업데이트는 반드시 this.setState로 해야됨
-    console.log("items : ", this.state.items);
-  }
+  // add = (item) => {
+  //   const thisItems = this.state.items;
+  //   item.id = "ID-" + thisItems.length; //key를 위한 id 추가
+  //   item.done = false; // done 초기화
+  //   thisItems.push(item); // 리스트에 아이템 추가
+  //   this.setState({ items: thisItems }); // 업데이트는 반드시 this.setState로 해야됨
+  //   console.log("items : ", this.state.items);
+  // }
   /*
   * 함수 추가 끝.
   *==================================================
@@ -47,15 +47,15 @@ class App extends React.Component {
   */
 
   //  (1) 함수 추가
-  delete = (item) => {
-    const thisItems = this.state.items;
-      console.log("Before Update Items : ", this.state.items)
-    const newItems = thisItems.filter(e => e.id !== item.id);
-    this.setState({ items: newItems }, () => {
-      //디버깅 콜백
-      console.log("Update Items : ", this.state.items)
-    });
-  }
+  // delete = (item) => {
+  //   const thisItems = this.state.items;
+  //     console.log("Before Update Items : ", this.state.items)
+  //   const newItems = thisItems.filter(e => e.id !== item.id);
+  //   this.setState({ items: newItems }, () => {
+  //     //디버깅 콜백
+  //     console.log("Update Items : ", this.state.items)
+  //   });
+  // }
   /*
   * 함수 추가 끝.
   *==================================================
@@ -67,31 +67,67 @@ class App extends React.Component {
   * 마운팅 과정에서 constructor와 render 함수를 부르는데 마운팅을 마친 후 바로 부르는 함수가 하나더 있다.
   * 그것이 바로 componentDidMount함수이다.
   */
-  componentDidMount() {
-    const requestOptions = {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    };
+  // componentDidMount() {
+  //   const requestOptions = {
+  //     method: "GET",
+  //     headers: { "Content-Type": "application/json" },
+  //   };
 
-    fetch("http://localhost:8080/todo", requestOptions)
-      .then((response) => response.json())
-      .then(
-        (response) => {
-          this.setState({
-            items: response.data,
-          });
-        },
-        (error) => {
-          this.setState({
-            error,
-          });
-        }
-      );
-  }
+  //   fetch("http://localhost:8080/todo", requestOptions)
+  //     .then((response) => response.json())
+  //     .then(
+  //       (response) => {
+  //         this.setState({
+  //           items: response.data,
+  //         });
+  //       },
+  //       (error) => {
+  //         this.setState({
+  //           error,
+  //         });
+  //       }
+  //     );
+  // }
   /*
-  * 함수 추가 끝.
+  * 함수 추가 끝. // 3-39. componentDidMount()함수는 3-43. 컴포넌트를 위해 잠시 주석처리 함.
   *==================================================
   */
+   /*
+  *=================================================
+  * 3.3.2 corse : Cross Origin Resource Sharing 
+  * 실습코드 3-43. App 컴포넌트에 ApiService 사용.
+  * ApiService에서 작성한 call method를 사용하면 아주 간단하게 APi를 콜 할 수 있다.
+  */
+  componentDidMount() {
+      call("/todo", "GET", null).then((response) =>
+        this.setState({ items: response.data})
+      );
+    }
+    add = (item) => {
+      call("/todo", "POST", item).then((response) =>
+        this.setState({ items: response.data })
+        );
+    }
+
+    delete = (item) => {
+      call("/todo", "DELETE", item).then((response) =>
+        this.setState({ items: response.data })
+        );
+    };
+  //===============함수 추가 영역 끝 ===============================
+   /*
+  *=================================================
+  * 3.3.2 corse : Cross Origin Resource Sharing 
+  * 실습코드 3-44. App 컴포넌트에 update 함수 구현
+  * ApiService에서 작성한 call method를 사용하면 아주 간단하게 APi를 콜 할 수 있다.
+  */
+
+    update = (item) => {
+      call("/todo", "PUT", item).then((response) =>
+        this.setState({ items: response.data })
+        );
+    };
+
   //===============함수 추가 영역 끝 ===============================
   //===============렌더 영역 시작===================================
   
@@ -106,8 +142,14 @@ class App extends React.Component {
             /* 실습코드 3-25. App.js Todo의 delete에 연결.
             * delete 함수 연결
             */
-              delete={this.delete}/>
+              delete={this.delete}
             // delete 함수 연결 끝.
+            /* 실습코드 3-45. Todo의 props에 연결 해 주기...
+            * update 함수 연결 시작.
+            */
+              update={this.update}
+            // update 함수 연결 끝.  
+            />
           ))}
         </List>
       </Paper>
