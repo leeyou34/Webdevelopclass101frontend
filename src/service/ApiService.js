@@ -7,7 +7,7 @@
 import { API_BASE_URL } from "../app-config"; // app-config의 이름이 api-config로 바뀔수 있음... 추후 고민해야함...
 
 export function call (api, method, request) {
-    const options = {
+    let options = { //jan 3rd const options -> let options로 변경. 일단... https://github.com/fsoftwareengineer/todo-application/discussions/9   링크 참고
         headers: new Headers({
             "Content-Type": "application/json",
         }),
