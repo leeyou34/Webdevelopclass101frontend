@@ -28,8 +28,8 @@ export function call (api, method, request) {
         })
     )
     /*=========================================
-    * 실습코드 5-5 ApiService.js에서 catch & redirect
-    * Jan 10th 2022, call method는 결국 fetch 메서드를 부른다. 이 fetch 메서드를
+    * Jan 10th 2022, 실습코드 5-5 ApiService.js에서 catch & redirect
+    * call method는 결국 fetch 메서드를 부른다. 이 fetch 메서드를
     * 사용하기 위해서는. API를 콜하고 . then을 이용해 그 결과를 받아 올 수 있다.
     * 그런제 만약 에러 response가 리턴된다면 우리는 3.3.3.절의 '자바스크립트 Promise'
     * 에서 catch 메서드를 사용해 에러를 받아 볼 수 있다. 
@@ -46,6 +46,21 @@ export function call (api, method, request) {
         return Promise.reject(error); 
         // Jan 10th 2022, 책에는 return Promise.reject(json); 로 되어있으나,
         // discussion을 참고하여 return Promise.reject(error); 로 변경.
+        }
+        );
     }
-    );
-}
+
+    /*===============================================
+    * Jan 10th 2022, 실습코드 5-6 ApiService에서 signin 함수.
+    * 로그인 API 서비스는 /auth/signin 이다. 이 경로를 이용해 로그인하는 메서드를
+    * ApiService.js에 작성한다. 로그인 서비스 함수를 작성해보자.
+    * 
+    =================================================*/ 
+
+    export function signin(userDTO) {
+        return call("/auth/signin", "POST", userDTO)
+        .then((response) => {
+            console.log("response : ", response);
+            alert("로그인 토큰: " + response.token);
+        });
+    }
