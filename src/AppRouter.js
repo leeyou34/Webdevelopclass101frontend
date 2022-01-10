@@ -52,21 +52,17 @@ class AppRouter extends React.Component {
             //=======================================To-Be
             //<Switch>태그가 <Routes로 변환됨> https://github.com/fsoftwareengineer/todo-application/discussions/29
             <div>
-            <Router>
-                <div>
-                    <Routes>
-                        <Route path="/login">
-                            <Login />
-                        </Route>
-                        <Route path="/">
-                            <App />
-                        </Route>
-                    </Routes>
-                </div>
-                <Box mt={5}>
-                    <Copyright />
-                </Box>
-            </Router>
+                <Router>
+                    <div>
+                        <Routes>
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/" element={<App />} />
+                        </Routes>
+                    </div>
+                    <Box mt={5}>
+                        <Copyright />
+                    </Box>
+                </Router>
             </div>
         );
     }
