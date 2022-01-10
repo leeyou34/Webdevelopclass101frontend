@@ -26,5 +26,26 @@ export function call (api, method, request) {
             }
             return json;
         })
+    )
+    /*=========================================
+    * 실습코드 5-5 ApiService.js에서 catch & redirect
+    * Jan 10th 2022, call method는 결국 fetch 메서드를 부른다. 이 fetch 메서드를
+    * 사용하기 위해서는. API를 콜하고 . then을 이용해 그 결과를 받아 올 수 있다.
+    * 그런제 만약 에러 response가 리턴된다면 우리는 3.3.3.절의 '자바스크립트 Promise'
+    * 에서 catch 메서드를 사용해 에러를 받아 볼 수 있다. 
+    * 따라서, 이 catch 메서드 안에서 상태 코드를 분석해 403 forbidden경우, 
+    * login페이지로 리다이렉트가 가능하다.
+    *
+    ===========================================*/
+    .catch((error) => {
+        //추가 된 부분
+        console.log(error.status);
+        if (error.status === 403) {
+            window.location.href = "/login"; //redirect
+        }
+        return Promise.reject(error); 
+        // Jan 10th 2022, 책에는 return Promise.reject(json); 로 되어있으나,
+        // discussion을 참고하여 return Promise.reject(error); 로 변경.
+    }
     );
 }

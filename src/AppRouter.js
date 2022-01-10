@@ -67,7 +67,14 @@ class AppRouter extends React.Component {
         );
     }
 }
-
+/*=================================
+* Jan 10th 2022. 실습코드 5-4 변경사항. (https://github.com/sijune/todo-frontend/blob/master/src/AppRoute.js#L8) 참고
+*   <Routes> ==> <Switch>에서 Routes로 변경됨. 
+*        <Route path="/login" element={<Login />} />
+*        <Route path="/" element={<App />} />
+*    </Routes>
+* 기존 페이지 289와는 조금 다름.
+===================================*/
 
 export default AppRouter;
 
