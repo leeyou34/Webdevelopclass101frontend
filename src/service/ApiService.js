@@ -59,8 +59,17 @@ export function call (api, method, request) {
 
     export function signin(userDTO) {
         return call("/auth/signin", "POST", userDTO)
-        .then((response) => {
-            console.log("response : ", response);
-            alert("로그인 토큰: " + response.token);
+            .then((response) => {
+            //    console.log("response : ", response); // 실습코드 5-8을 위해 주석처리
+            //    alert("로그인 토큰: " + response.token); // 실습코드 5-8을 위해 주석처리
+        
+            /*===============================
+            * Jan 10th 2022, 실습코드 5-8 로그인 성공 시 메인 화면으로 리디렉트
+            * ApiService.js의 signin 함수를 수정 
+            ================================*/
+            if(response.token) {
+                // token이 존재하는 경우 Todo 화면으로 리디렉트
+                window.location.href = "/";
+            }
         });
     }
