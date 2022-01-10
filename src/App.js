@@ -5,7 +5,8 @@ import React from 'react';
 import AddTodo from './AddTodo.js'; // 실습코드 3-16. App.js에 AddTodo 컴포넌트 추가.
 import {Paper, List, Container} from "@material-ui/core"; // 실습코드 3-16. App.js에 AddTodo 컴포넌트 추가.
 import { call } from "./service/ApiService"; // 실습코드 3-43. App 컴포넌트에서 ApiService 사용
-
+import { Grid, Button, AppBar, Toolbar, Typography } from "@material-ui/core"; // 실습코드 5-13. App 컴포넌트에 네비게이션 바 추가
+import { signin, signout} from "./service/ApiService"; // 실습코드 5-13. App 컴포넌트에 네비게이션 바 추가
 
 class App extends React.Component {
   constructor(props) {
@@ -155,6 +156,28 @@ class App extends React.Component {
       </Paper>
     );
 
+    /*==================================================
+    * Jan 10th 2022, 실습코드 5-13 App component에 네비게이션 바 추가
+    ===================================================*/
+    // navigationBar 추가
+    var navigationBar = (
+      <AppBar position="static">
+        <Toolbar>
+          <Grid justify="space-between" container>
+            <Grid item>
+              <Typography variant="h6">오늘의 할일</Typography>
+            </Grid>
+            <Grid>
+              <Button color="inherit" onClick={signout}>
+                로그아웃
+              </Button>
+            </Grid>
+          </Grid>
+        </Toolbar>
+      </AppBar>
+    );
+    //==================================실습코드 5-13 추가 완료======
+    // props로 넘겨주기
     return (
       <div className="App">
         <Container maxWidth="md">
