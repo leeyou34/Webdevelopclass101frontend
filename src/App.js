@@ -3,10 +3,10 @@ import './App.css';
 import Todo from './Todo'; // 실습코드 3-8. App 컴포넌트에서 Todo 컴포넌트 사용하기... todo component를 위해 추가됨.
 import React from 'react';
 import AddTodo from './AddTodo.js'; // 실습코드 3-16. App.js에 AddTodo 컴포넌트 추가.
-import {Paper, List, Container} from "@material-ui/core"; // 실습코드 3-16. App.js에 AddTodo 컴포넌트 추가.
-import { call } from "./service/ApiService"; // 실습코드 3-43. App 컴포넌트에서 ApiService 사용
-import { Grid, Button, AppBar, Toolbar, Typography } from "@material-ui/core"; // 실습코드 5-13. App 컴포넌트에 네비게이션 바 추가
-import { signin, signout} from "./service/ApiService"; // 실습코드 5-13. App 컴포넌트에 네비게이션 바 추가
+import {Paper, List, Container} from '@material-ui/core'; // 실습코드 3-16. App.js에 AddTodo 컴포넌트 추가.
+import {call } from './service/ApiService'; // 실습코드 3-43. App 컴포넌트에서 ApiService 사용
+import {Grid, Button, AppBar, Toolbar, Typography } from '@material-ui/core'; // 실습코드 5-13. App 컴포넌트에 네비게이션 바 추가
+import {signin, signout} from './service/ApiService'; // 실습코드 5-13. App 컴포넌트에 네비게이션 바 추가
 
 class App extends React.Component {
   constructor(props) {
@@ -18,6 +18,11 @@ class App extends React.Component {
         //{id: "1", title: "Hello World 2", done: false},
         // add와 delete 라는 기본적인 기능이 있어서 상기 id: "0" blah blah는 주석처리됨.
       ],
+      /*==============================
+      * 실습코드 5-14. App.js에 로딩 중 로직 추가.
+      ===============================*/
+      loading: true,
+      // loading 추가 완료.
     };
   }
   //================함수 추가 영역 시작====================================================
@@ -101,7 +106,9 @@ class App extends React.Component {
   */
   componentDidMount() {
       call("/todo", "GET", null).then((response) =>
-        this.setState({ items: response.data})
+        this.setState({ items: response.data,
+        loading: false//실습코드 5-14... Get요청이 성공적으로 리턴하는 경우 loading을 false로 고친다. 더이상 로딩중이 아니라는 소리다.
+        })
       );
     }
     add = (item) => {
@@ -177,18 +184,44 @@ class App extends React.Component {
       </AppBar>
     );
     //==================================실습코드 5-13 추가 완료======
-    // props로 넘겨주기
-    return (
-      <div className="App">
+    //==================================실습코드 5-14 추가 시작======
+    /*로딩 중이 아닐 때 렌더링 할 부분*/
+    var todoListPage = (
+      <div>
+        {navigationBar} {/*네비게이션바 렌더링*/}
         <Container maxWidth="md">
-          <AddTodo add={this.add} /*this add={this.add} section was omitted on 실습코드3-18. add함수 추가 *//>   
+          <AddTodo add={this.add} />
           <div className="TodoList">{todoItems}</div>
         </Container>
       </div>
     );
-  }
-}
+    /*로딩 중일 때 렌더링 할 부분*/
+    var loadingPage = <h1> Loading... </h1>;
 
+    var content = loadingPage;
+      if (!this.state.loading) {
+        /*로딩 중이 아니면 todoListPage를 선택 */
+        content = todoListPage;
+      }
+
+      /* 선택한 content 렌더링 */
+      return <div className="App">{content}</div>
+    }
+}
+    //=================================실습코드 5-14 추가완료=======
+    //=================================실습코드 5-14를 위해 실습코드 3-18은 주석처리함==
+    // 3. props로 넘겨주기
+//     return (
+//       <div className="App">
+//         <Container maxWidth="md">
+//           <AddTodo add={this.add} /*this add={this.add} section was omitted on 실습코드3-18. add함수 추가 *//>   
+//           <div className="TodoList">{todoItems}</div>
+//         </Container>
+//       </div>
+//     );
+//   }
+// }
+    //================================실습코드 3-18 주석처리 완료=========
 export default App;
 
 //============================================================

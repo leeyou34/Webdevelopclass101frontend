@@ -73,9 +73,8 @@ export function call (api, method, request) {
     * 
     =================================================*/ 
 
-export function signin(userDTO) {
-    return call("/auth/signin", "POST", userDTO)
-        .then((response) => {
+export function signin(userDTO) { 
+    return call("/auth/signin", "POST", userDTO).then((response) => {
         //    console.log("response : ", response); // 실습코드 5-8을 위해 주석처리
         //    alert("로그인 토큰: " + response.token); // 실습코드 5-8을 위해 주석처리
     
