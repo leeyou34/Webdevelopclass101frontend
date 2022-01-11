@@ -101,3 +101,13 @@ export function signout() {
     localStorage.setItem(ACCESS_TOKEN, null);
     window.location.href = "/login";
 }
+
+    /*===============================================
+    * Jan 11th 2022, 실습코드 5-15 계정생성 로직 ApiService에 signup 함수 추가
+    * ApiService에 signup 메서드 추가.
+    * 이 메서드를 이용해 백엔드에 signup 요청을 보낸다.
+    =================================================*/ 
+
+export function signup(userDTO) {
+    return call("/auth/signup", "POST", userDTO);
+}

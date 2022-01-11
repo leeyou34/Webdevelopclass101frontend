@@ -14,6 +14,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 
+import SignUp from "./SignUp"; // 실습코드 5-17. AppRouter에 SignUp 라우트 추가.
+
 // Jan 9th 2022, below function and class were added by thomas lee
 
 function Copyright() {
@@ -56,6 +58,7 @@ class AppRouter extends React.Component {
                     <div>
                         <Routes>
                             <Route path="/login" element={<Login />} />
+                            <Route path="/signup" element={<SignUp/>} />
                             <Route path="/" element={<App />} />
                         </Routes>
                     </div>
