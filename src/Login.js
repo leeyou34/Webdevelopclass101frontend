@@ -8,10 +8,15 @@
 import { Button, TextField } from "@material-ui/core";
 import React from "react";
 import { signin } from "./service/ApiService";
-// 하기는 실습코드 5-7를 위한 import library임.
+// 하기는 실습코드 5-7.를 위한 import library임.
 import { Grid, Typography} from "@material-ui/core";
 import { Container } from "@material-ui/core"
-// 실습코드 6-7 library add 끝.
+// 실습코드 5-7. library add 끝.
+// 실습코드 5-18. 로그인 컴포넌트 수정
+import {
+    Link
+} from "@material-ui/core";
+// 실습코드 5-18. 컴포넌트 수정 끝.
 
 class Login extends React.Component {
     constructor(props) {
@@ -82,6 +87,9 @@ class Login extends React.Component {
                                 로그인
                                 </Button>
                         </Grid>
+                        <Link href="/signup" variant="body2"/*실습코드5-18. 로그인 컴포넌트 부분 추가.*/> 
+                            <Grid item/*실습코드5-18. 로그인 컴포넌트 부분 추가.*/>계정이 없습니까? 여기서 가입하세요.</Grid>
+                        </Link>
                     </Grid>
                 </form>
             </Container>

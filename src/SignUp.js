@@ -10,7 +10,7 @@ import {
 
 import { signup } from "./service/ApiService";
 
-class SignUp extends React.component {
+class SignUp extends React.Component {
     constructor(props) {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
