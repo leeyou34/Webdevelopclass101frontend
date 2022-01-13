@@ -170,7 +170,7 @@ class App extends React.Component {
     var navigationBar = (
       <AppBar position="static">
         <Toolbar>
-          <Grid justify="space-between" container>
+          <Grid justifyContent="space-between" container/*Grid justify=> Grid justifyContent로 1/13일 변경 react.js업글 사유로 */>
             <Grid item>
               <Typography variant="h6">오늘의 할일</Typography>
             </Grid>

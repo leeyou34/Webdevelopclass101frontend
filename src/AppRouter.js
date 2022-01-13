@@ -10,7 +10,7 @@ import "./index.css";
 import App from "./App";
 import Login from "./Login";
 //import { BrowserRouter as Router, Switch, Route } from "react-router-dom"; // Jan 9th 2022, react-router-dom 버젼 6.2.1사유로 Switch가 적용이 안됨.
-import { BrowserRouter, Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 
@@ -53,7 +53,6 @@ class AppRouter extends React.Component {
             //=======================================
             //=======================================To-Be
             //<Switch>태그가 <Routes로 변환됨> https://github.com/fsoftwareengineer/todo-application/discussions/29
-            <BrowserRouter /*added*/> 
             <div>
                 <Router>
                     <div>
@@ -68,7 +67,6 @@ class AppRouter extends React.Component {
                     </Box>
                 </Router>
             </div>
-            </BrowserRouter>
         );
     }
 }

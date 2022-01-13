@@ -1,3 +1,9 @@
+/*====================================================================
+* 실습코드 5-16. 계정 생성 페이지
+* Jan 11th 2022, src/SignUp.js를 만든 후 계정생성 페이지 구현.
+=====================================================================*/
+
+
 import React from "react";
 import {
     Button,
@@ -60,7 +66,7 @@ class SignUp extends React.Component {
                                 fullWidth
                                 id="email"
                                 label="이메일 주소"
-                                name="emil"
+                                name="email"
                                 autoComplete="email"
                                 />
                         </Grid>
@@ -87,7 +93,7 @@ class SignUp extends React.Component {
                             </Button> 
                         </Grid>                        
                     </Grid>
-                    <Grid container justify="flex-end">
+                    <Grid container justifyContent="flex-end"/*Grid justify=> Grid justifyContent로 1/13일 변경 react.js업글 사유로 */>
                         <Grid item>
                             <Link href="/login" variant="body2">
                                 이미 계정이 있습니까? 로그인 하세요.
