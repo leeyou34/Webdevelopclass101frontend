@@ -65,6 +65,9 @@ export default function TodoPage() {
           <Typography variant="h6" component="h1" sx={{ flexGrow: 1, fontWeight: 700 }}>
             오늘의 할 일
           </Typography>
+          <Button color="inherit" onClick={() => navigate("/ops")}>
+            운영관리
+          </Button>
           <Button color="inherit" onClick={handleSignout}>
             로그아웃
           </Button>

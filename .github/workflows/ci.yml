@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master, yh.thomas.lee, 'upgrade-*']
+    branches: ['**']
   pull_request:
 
 jobs:

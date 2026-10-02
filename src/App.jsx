@@ -5,6 +5,13 @@ import { getToken, setUnauthorizedHandler } from "./api.js";
 import LoginPage from "./pages/LoginPage.jsx";
 import SignUpPage from "./pages/SignUpPage.jsx";
 import TodoPage from "./pages/TodoPage.jsx";
+import OpsLayout from "./pages/ops/OpsLayout.jsx";
+import DashboardPage from "./pages/ops/DashboardPage.jsx";
+import OrdersPage from "./pages/ops/OrdersPage.jsx";
+import DevicesPage from "./pages/ops/DevicesPage.jsx";
+import ReportPage from "./pages/ops/ReportPage.jsx";
+import ShopsPage from "./pages/ops/ShopsPage.jsx";
+import ActivityPage from "./pages/ops/ActivityPage.jsx";
 
 function RequireLogin({ children }) {
   return getToken() ? children : <Navigate to="/login" replace />;
@@ -31,6 +38,21 @@ export default function App() {
               </RequireLogin>
             }
           />
+          <Route
+            path="/ops"
+            element={
+              <RequireLogin>
+                <OpsLayout />
+              </RequireLogin>
+            }
+          >
+            <Route index element={<DashboardPage />} />
+            <Route path="orders" element={<OrdersPage />} />
+            <Route path="devices" element={<DevicesPage />} />
+            <Route path="report" element={<ReportPage />} />
+            <Route path="shops" element={<ShopsPage />} />
+            <Route path="activity" element={<ActivityPage />} />
+          </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Box>
