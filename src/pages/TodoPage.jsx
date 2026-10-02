@@ -16,6 +16,7 @@ import {
 import { signout, todoApi } from "../api.js";
 import AddTodo from "../components/AddTodo.jsx";
 import TodoItem from "../components/TodoItem.jsx";
+import OpsTasksPanel from "./ops/OpsTasksPanel.jsx";
 
 export default function TodoPage() {
   const navigate = useNavigate();
@@ -76,6 +77,11 @@ export default function TodoPage() {
 
       <Container maxWidth="md" sx={{ py: 4 }}>
         <Stack spacing={2}>
+          <OpsTasksPanel />
+
+          <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, pt: 1 }}>
+            내 할 일
+          </Typography>
           <AddTodo onAdd={(title) => run(() => todoApi.create(title))} disabled={busy} />
 
           {error && (

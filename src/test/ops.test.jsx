@@ -28,6 +28,26 @@ function fakeOps() {
     pendingRefunds: 0,
     suggestions: [{ level: "warning", message: "교환해 보냈지만 아직 회수하지 못한 불량 기기가 1대입니다.", targetType: "case", targetId: null }],
   });
+  const summary = (n) => ({
+    requests: n, cancelled: 1, delivered: { android: n, ios: 1 }, invoiced: { android: n, ios: 0 },
+    revenue: n * 143000, cost: n * 130000, profit: n * 13000, collected: n * 100000, returns: 0, exchanges: 1, repairs: 0,
+  });
+  const analytics = (from, to) => ({
+    from, to, unit: "month", previousFrom: "2025-01-01", previousTo: "2025-09-30",
+    summary: summary(12), previous: summary(10),
+    series: [
+      { key: "2026-08", label: "26.8", android: 5, ios: 1, revenue: 888000, profit: 70000, collected: 700000 },
+      { key: "2026-09", label: "26.9", android: 7, ios: 0, revenue: 1001000, profit: 91000, collected: 900000 },
+    ],
+    byShop: [{ shopCode: "S001", shopName: "한빛(방)", android: 7, ios: 1, revenue: 1174000 }],
+  });
+  const tasks = [
+    { key: "refund-r1", dueOn: "2026-09-30", priority: 1, category: "환불", title: "한빛(방) 서0윤에게 143,000원 환불",
+      detail: "고객에게 돌려줄 돈입니다.", page: "orders", cycleId: "c1", focusId: "r1", month: null },
+    { key: "close-c1", dueOn: "2026-10-07", priority: 2, category: "신청·입금", title: "2026-10 신청 마감",
+      detail: "", page: "orders", cycleId: "c1", focusId: null, month: null },
+  ];
+  state.analyticsCalls = [];
   const json = (status, body) =>
     Promise.resolve(new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } }));
 
@@ -40,6 +60,10 @@ function fakeOps() {
 
     if (method === "GET") {
       if (pathname === "/printer/dashboard") return json(200, dashboard());
+      if (pathname === "/printer/analytics") state.analyticsCalls.push(searchParams.get("from"));
+      if (pathname === "/printer/analytics") return json(200, analytics(searchParams.get("from"), searchParams.get("to")));
+      if (pathname === "/printer/tasks") return json(200, { asOf: "2026-10-02", tasks: state.shops.length ? tasks : [] });
+      if (pathname === "/todo") return json(200, { data: [] });
       if (pathname === "/printer/shops") return json(200, state.shops);
       if (pathname === "/printer/cycles") return json(200, state.cycles);
       if (pathname === "/printer/requests")
@@ -87,9 +111,37 @@ describe("모바일 프린터 운영관리", () => {
     const user = userEvent.setup();
     renderAt("/ops");
     await user.click(await screen.findByRole("button", { name: "체험 데이터 만들기" }));
-    expect(await screen.findByText("2026-10 현황")).toBeInTheDocument();
-    expect(screen.getByText("교환해 보냈지만 아직 회수하지 못한 불량 기기가 1대입니다.")).toBeInTheDocument();
-    expect(screen.getByText("90,000원")).toBeInTheDocument();
+    expect(await screen.findByText("배송 완료 기준")).toBeInTheDocument();
+    expect(screen.getByText("13대")).toBeInTheDocument();
+    expect(screen.getByText(/지난 기간 대비 ▲ 2대/)).toBeInTheDocument();
+    expect(screen.getByText("한빛(방) 서0윤에게 143,000원 환불")).toBeInTheDocument();
+    expect(screen.getByText(/90,000원 · 1건/)).toBeInTheDocument();
+  });
+
+  it("기간 버튼을 바꾸면 그 기간으로 다시 불러온다", async () => {
+    const user = userEvent.setup();
+    await backend.fetch("/printer/demo", { method: "POST", headers: { Authorization: "Bearer good-token" } });
+    renderAt("/ops");
+    await screen.findByText("배송 완료 기준");
+    const before = backend.state.analyticsCalls.length;
+    await user.click(screen.getByRole("button", { name: "올해" }));
+    await waitFor(() => expect(backend.state.analyticsCalls.length).toBeGreaterThan(before));
+    expect(backend.state.analyticsCalls.at(-1)).toMatch(/^\d{4}-01-01$/);
+    await user.click(screen.getByRole("button", { name: "직접 설정" }));
+    expect(screen.getByLabelText("시작일")).toBeInTheDocument();
+  });
+
+  it("할 일 화면에 운영 업무가 날짜·중요도순으로 나오고, 누르면 해당 신청 줄로 이동한다", async () => {
+    const user = userEvent.setup();
+    await backend.fetch("/printer/demo", { method: "POST", headers: { Authorization: "Bearer good-token" } });
+    renderAt("/");
+    expect(await screen.findByText("운영 업무")).toBeInTheDocument();
+    expect(screen.getByText(/밀린 일 · 1건/)).toBeInTheDocument();
+    expect(screen.getByText("긴급")).toBeInTheDocument();
+    expect(screen.getByText(/2일 지남/)).toBeInTheDocument();
+    await user.click(screen.getByText("한빛(방) 서0윤에게 143,000원 환불"));
+    const row = (await screen.findByText("서0윤")).closest("tr");
+    expect(row).toHaveClass("Mui-selected");
   });
 
   it("신청 목록에서 입금 확인(동작 3)을 실행하면 상태가 바뀐다", async () => {

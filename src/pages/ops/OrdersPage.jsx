@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
 import {
   Alert,
   Box,
@@ -17,6 +18,9 @@ import {
   Typography,
 } from "@mui/material";
 import { ops } from "../../api.js";
+
+/** 할 일에서 눌러 넘어온 줄 표시 */
+const FOCUS = { "&.Mui-selected, &.Mui-selected:hover": { bgcolor: "#fff1e8", boxShadow: "inset 4px 0 0 #eb6834" } };
 import { INVOICE_STATUS, INVOICE_TYPE, REQUEST_STATUS, today, thisMonth, won } from "./labels.js";
 import ActionDialog from "./ActionDialog.jsx";
 import StatusChip from "./StatusChip.jsx";
@@ -60,7 +64,12 @@ function Empty({ cols, text }) {
 }
 
 export default function OrdersPage() {
-  const [cycleId, setCycleId] = useState("");
+  const [params] = useSearchParams();
+  const focus = params.get("focus");
+  const [cycleId, setCycleId] = useState(params.get("cycle") || "");
+  useEffect(() => {
+    if (params.get("cycle")) setCycleId(params.get("cycle"));
+  }, [params]);
   const { data, error, reload } = useLoad(async () => {
     const [cycles, shops, requests, orders, invoices, devices] = await Promise.all([
       ops.cycles(),
@@ -83,6 +92,11 @@ export default function OrdersPage() {
   useEffect(() => {
     if (cycles.length && !cycles.some((c) => c.id === cycleId)) setCycleId(cycles[0].id);
   }, [cycles, cycleId]);
+
+  // 할 일에서 넘어왔으면 그 줄로 스크롤
+  useEffect(() => {
+    if (focus && data) document.getElementById(`row-${focus}`)?.scrollIntoView?.({ block: "center", behavior: "smooth" });
+  }, [focus, data, cycleId]);
 
   if (error) return <Alert severity="error">{error}</Alert>;
   if (!data) return <CircularProgress />;
@@ -544,7 +558,7 @@ export default function OrdersPage() {
                 <TableBody>
                   {requests.length === 0 && <Empty cols={9} text="아직 신청이 없습니다." />}
                   {requests.map((r) => (
-                    <TableRow key={r.id} hover>
+                    <TableRow key={r.id} id={`row-${r.id}`} hover selected={focus === r.id} sx={FOCUS}>
                       <TableCell>{shopName[r.shopId]}</TableCell>
                       <TableCell>{r.applicantName}</TableCell>
                       <TableCell align="right">{r.androidQty}</TableCell>
@@ -584,7 +598,7 @@ export default function OrdersPage() {
                 <TableBody>
                   {orders.length === 0 && <Empty cols={7} text="배송 리스트를 확정한 뒤 발주서를 만듭니다." />}
                   {orders.map((o) => (
-                    <TableRow key={o.id}>
+                    <TableRow key={o.id} id={`row-${o.id}`} selected={focus === o.id} sx={FOCUS}>
                       <TableCell>{o.orderNo}</TableCell>
                       <TableCell>{o.orderedOn}</TableCell>
                       <TableCell align="right">
@@ -627,7 +641,7 @@ export default function OrdersPage() {
                   {invoices.map((i) => {
                     const r = requestById[i.requestId];
                     return (
-                      <TableRow key={i.id}>
+                      <TableRow key={i.id} id={`row-${i.id}`} selected={focus === i.id} sx={FOCUS}>
                         <TableCell>{INVOICE_TYPE[i.type]}</TableCell>
                         <TableCell>{r ? `${shopName[r.shopId] || ""} ${r.applicantName}` : "본사"}</TableCell>
                         <TableCell align="right">{won(i.amount)}</TableCell>

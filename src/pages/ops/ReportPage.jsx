@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router";
 import {
   Alert,
   Button,
@@ -46,7 +47,8 @@ const prevMonth = () => {
 };
 
 export default function ReportPage() {
-  const [month, setMonth] = useState(prevMonth());
+  const [params] = useSearchParams();
+  const [month, setMonth] = useState(params.get("month") || prevMonth());
   const { data, error, reload } = useLoad(() => ops.report(month), [month]);
   const { notice, setNotice, run } = useOps(reload);
 

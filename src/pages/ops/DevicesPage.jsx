@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 import {
   Alert,
   Button,
@@ -16,6 +17,9 @@ import {
   Typography,
 } from "@mui/material";
 import { ops } from "../../api.js";
+
+/** 할 일에서 눌러 넘어온 줄 표시 */
+const FOCUS = { "&.Mui-selected, &.Mui-selected:hover": { bgcolor: "#fff1e8", boxShadow: "inset 4px 0 0 #eb6834" } };
 import { CASE_STATUS, CASE_TYPE, DEVICE_STATUS, MODEL, today } from "./labels.js";
 import ActionDialog from "./ActionDialog.jsx";
 import StatusChip from "./StatusChip.jsx";
@@ -34,6 +38,11 @@ export default function DevicesPage() {
   });
   const { notice, setNotice, run } = useOps(reload);
   const [dialog, setDialog] = useState(null);
+  const [params] = useSearchParams();
+  const focus = params.get("focus");
+  useEffect(() => {
+    if (focus && data) document.getElementById(`row-${focus}`)?.scrollIntoView?.({ block: "center", behavior: "smooth" });
+  }, [focus, data]);
 
   if (error) return <Alert severity="error">{error}</Alert>;
   if (!data) return <CircularProgress />;
@@ -190,7 +199,7 @@ export default function DevicesPage() {
                 </TableRow>
               )}
               {data.cases.map((k) => (
-                <TableRow key={k.id}>
+                <TableRow key={k.id} id={`row-${k.id}`} selected={focus === k.id} sx={FOCUS}>
                   <TableCell>
                     {CASE_TYPE[k.type]}
                     {k.type === "REPAIR" && k.freeWarranty != null ? (k.freeWarranty ? " (무상)" : " (유상)") : ""}

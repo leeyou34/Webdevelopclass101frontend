@@ -111,6 +111,8 @@ const q = (params) => {
 
 export const ops = {
   dashboard: (asOf) => call(`/printer/dashboard${q({ asOf })}`),
+  analytics: (from, to) => call(`/printer/analytics${q({ from, to })}`),
+  tasks: (asOf) => call(`/printer/tasks${q({ asOf })}`),
   shops: () => call("/printer/shops"),
   cycles: () => call("/printer/cycles"),
   requests: (cycleId) => call(`/printer/requests${q({ cycleId })}`),
