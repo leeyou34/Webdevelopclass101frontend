@@ -1,130 +1,47 @@
-<p align="center"> 
-<h1 align="center">Todo Application</h1>
-</p>
+<h1 align="center">Todo Application · 화면 (v2)</h1>
 
+> **2026년 10월 업그레이드판입니다.**
+> 2021–22년에 책을 따라 처음 만든 버전은 [`legacy-2022` 브랜치](https://github.com/leeyou34/Webdevelopclass101frontend/tree/legacy-2022)에 그대로 남겨 두었습니다.
+>
+> 서버(백엔드)와 프로그램 설명·장점·응용 방안: [Webdevelopclass101](https://github.com/leeyou34/Webdevelopclass101)
 
-### 개요(Abstract)
+---
+
+## 이 화면이 하는 일
+
+- **회원가입** — 이름, 이메일, 비밀번호(8자 이상), 필요하면 초대 코드
+- **로그인** — 성공하면 내 할 일 목록으로 이동
+- **내 할 일** — 추가, 완료 표시(체크), 글자 눌러 고치기(Enter 저장 · Esc 취소), 삭제, 남은 일 개수 표시
+- 로그인이 만료되면 자동으로 로그인 화면으로 돌아갑니다.
+- 휴대폰 화면에서도 같은 기능을 쓸 수 있습니다.
+
+## 2022 → 2026 무엇이 달라졌나
+
+| 구분 | 2022 학습 버전 | 2026 업그레이드 |
+|---|---|---|
+| 개발 도구 | Create React App (지원 종료) | Vite |
+| 라이브러리 | React 17, Material-UI v4 | React 19, MUI v9, React Router |
+| 코드 구조 | 클래스 컴포넌트, 책 실습 주석 위주 | 함수 컴포넌트, 화면별 파일 분리 |
+| 로그아웃 | 토큰 자리에 `"null"` 문자열이 저장되어 다음 요청에 `Bearer null`이 전송됨 | 토큰을 지움 |
+| 오류 표시 | 콘솔 출력만 | 화면에 서버 메시지 표시 (비밀번호 틀림, 초대 코드 오류 등) |
+| 할 일 수정 | Enter로만 저장 | Enter·바깥 클릭 저장, Esc 취소, 빈 값 저장 방지 |
+| 서버 주소 | localhost일 때만 지정 | `VITE_API_BASE_URL`로 지정, 없으면 localhost는 `:8080`, 그 밖은 같은 도메인 |
+| 테스트 | 기본 생성 파일 | 로그인·가입·할 일 전체 흐름 테스트 5개 + GitHub Actions |
+
+## 실행 방법
+
+필요한 것: **Node.js 22** 이상, 그리고 [백엔드](https://github.com/leeyou34/Webdevelopclass101) 실행(`http://localhost:8080`)
+
+```bash
+npm install
+npm run dev        # http://localhost:5173
+npm test           # 자동 테스트
+npm run build      # 배포용 파일 → dist/
 ```
-  개인용 할일 목록 리스트 앱플리케이션 구축 (Personal Todo List Application)
-```
 
-### 목적
-```
-  1. React.js기초, AWS서버 활용, 스프링 부트 공부 목적으로 프로젝트 시작했습니다.
-  
-  2. 해당 애플리케이션을 통해 개인이 로그인하여 자기가 해야할 일들을 리스트화 하여 관리 할 수 있습니다.
-```
+다른 주소의 서버에 붙이려면 `.env.example`을 `.env`로 복사하고 `VITE_API_BASE_URL`을 적습니다.
 
-### 비고
-```
-  1. 이 애플리케이션은 "React.js, 스프링 부트, AWS로 배우는 웹 개발 101"
-  (도서 정보: http://www.acornpub.co.kr/book/reactjs-springboot)
-  참고하여 구축되었습니다.
+## 출처와 작업 기록
 
-  2. 이 Repository는 Frontend Server용 파일만 담고 있습니다. Backend 부분도 참고 하시려면...
-  다음 링크를 참고하시기 바랍니다. (https://github.com/leeyou34/Webdevelopclass101)
-```
-
-### 사용기술
-```
-1. 자바스크립트
-2. React.js
-3. node.js
-```
-
-### 질문과 답변
-```
-이 애플리케이션에 대해 궁금하신 사항들은 저보다, 
-하기의 저자님의 링크에 가셔서 질문 및 해답내역들을 참고하시기 바랍니다.
-https://github.com/fsoftwareengineer/todo-application/discussions
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!--
-
-
-# Getting Started with Create React App
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-
-
-
--->
+- 처음 버전(2021–22)은 『React.js, 스프링 부트, AWS로 배우는 웹 개발 101』(에이콘출판사)을 따라 만들었습니다.
+- 2026년 업그레이드는 AI(Claude)와 함께 진행했습니다.
