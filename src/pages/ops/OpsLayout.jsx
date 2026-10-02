@@ -1,5 +1,6 @@
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { AppBar, Box, Button, Container, Tab, Tabs, Toolbar, Typography } from "@mui/material";
+import { HOME_LABEL, HOME_URL } from "../../homeLink.js";
 import { signout } from "../../api.js";
 
 const TABS = [
@@ -23,6 +24,11 @@ export default function OpsLayout() {
           <Typography variant="h6" component="h1" sx={{ flexGrow: 1, fontWeight: 700 }}>
             모바일 프린터 운영관리
           </Typography>
+          {HOME_URL && (
+            <Button color="inherit" href={HOME_URL}>
+              {HOME_LABEL}
+            </Button>
+          )}
           <Button color="inherit" onClick={() => navigate("/")}>
             할 일
           </Button>

@@ -13,6 +13,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
+import { HOME_LABEL, HOME_URL } from "../homeLink.js";
 import { signout, todoApi } from "../api.js";
 import AddTodo from "../components/AddTodo.jsx";
 import TodoItem from "../components/TodoItem.jsx";
@@ -66,6 +67,11 @@ export default function TodoPage() {
           <Typography variant="h6" component="h1" sx={{ flexGrow: 1, fontWeight: 700 }}>
             오늘의 할 일
           </Typography>
+          {HOME_URL && (
+            <Button color="inherit" href={HOME_URL}>
+              {HOME_LABEL}
+            </Button>
+          )}
           <Button color="inherit" onClick={() => navigate("/ops")}>
             운영관리
           </Button>

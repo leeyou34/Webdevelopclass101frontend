@@ -111,4 +111,9 @@ describe("Todo 앱", () => {
     await waitFor(() => expect(screen.getByRole("heading", { name: "로그인" })).toBeInTheDocument());
     expect(localStorage.getItem("ACCESS_TOKEN")).toBeNull();
   });
+
+  it("초대 링크(?invite=)로 들어오면 가입 화면에 초대 코드가 채워져 있다", async () => {
+    renderAt("/signup?invite=NS-TEST01");
+    expect(await screen.findByDisplayValue("NS-TEST01")).toBeInTheDocument();
+  });
 });
