@@ -21,7 +21,7 @@ import Notice from "./Notice.jsx";
 import useLoad from "./useLoad.js";
 import useOps from "./useOps.js";
 
-const SAMPLE = "2017-08-03\t한빛서0윤\t157,300\n2017-08-03\t새봄문0희\t157,300";
+const SAMPLE = `${today()}\t한빛서0윤\t157,300\n${today()}\t새봄문0희\t157,300`;
 
 /** 통장 입금 내역 대조: 붙여 넣으면 금액·입금자명으로 신청 건을 찾아 입금 확인까지 처리 */
 export default function DepositsPage() {

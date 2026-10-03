@@ -1,3 +1,5 @@
+import { modelOfSerial } from "./labels.js";
+
 /**
  * 업무 문서 엑셀 만들기. 2016~2017년에 손으로 만들던 양식(발주서, 품의서, 배송리스트, 송장요청서,
  * 시리얼 출고 리스트, 세금계산서 발행리스트, 출고현황, 거래처별 월별 주문수량, 수익보고, 미수금 보고서, AS 요청현황)을
@@ -203,8 +205,10 @@ export function purchaseOrderDoc(po, s) {
 export function approvalDoc(po, cycle, requests, allOrders, s) {
   const seq = [...allOrders].sort((a, b) => a.orderedOn.localeCompare(b.orderedOn)).findIndex((o) => o.id === po.id) + 1;
   const qty = po.androidQty + po.iosQty;
-  const sale = po.androidQty * PRICE.saleA + po.iosQty * PRICE.saleI;
-  const cost = po.androidQty * PRICE.costA + po.iosQty * PRICE.costI;
+  const bufA = po.bufferAndroid || 0;
+  const bufI = po.bufferIos || 0;
+  const soldA = po.androidQty - bufA;
+  const soldI = po.iosQty - bufI;
   const live = requests.filter((r) => r.cycleId === po.cycleId && !["CANCELLED", "CANCELLED_UNPAID", "REFUNDED", "REFUND_PENDING"].includes(r.status));
   const shops = new Set(live.map((r) => r.shopId)).size;
   return [
@@ -242,20 +246,29 @@ export function approvalDoc(po, cycle, requests, allOrders, s) {
       para("2. 내용 (VAT 별도)", true);
       const start = r;
       const rows = [];
-      if (po.androidQty) rows.push(["안드로이드용", po.androidQty, PRICE.saleA, PRICE.costA]);
-      if (po.iosQty) rows.push(["아이폰용", po.iosQty, PRICE.saleI, PRICE.costI]);
+      if (soldA) rows.push(["안드로이드용 (신청분)", soldA, PRICE.saleA, PRICE.costA, true]);
+      if (soldI) rows.push(["아이폰용 (신청분)", soldI, PRICE.saleI, PRICE.costI, true]);
+      if (bufA) rows.push(["안드로이드용 (예비·재고)", bufA, 0, PRICE.costA, false]);
+      if (bufI) rows.push(["아이폰용 (예비·재고)", bufI, 0, PRICE.costI, false]);
       const end = table(
         ws,
         start,
         ["구분", "수량", "판매 단가", "판매 금액", "매입 단가", "매입 금액"],
-        rows.map((x, i) => [x[0], x[1], x[2], f(`B${start + 1 + i}*C${start + 1 + i}`, x[1] * x[2]), x[3], f(`B${start + 1 + i}*E${start + 1 + i}`, x[1] * x[3])]),
+        rows.map((x, i) => [x[0], x[1], x[2] || "-", x[2] ? f(`B${start + 1 + i}*C${start + 1 + i}`, x[1] * x[2]) : 0, x[3], f(`B${start + 1 + i}*E${start + 1 + i}`, x[1] * x[3])]),
         { sumCols: [2, 4, 6] },
       );
       r = end + 1;
-      ws.getCell(r, 5).value = "예상 수익";
-      ws.getCell(r, 6).value = f(`D${end}-F${end}`, sale - cost);
+      const soldRows = rows.map((x, i) => (x[4] ? `F${start + 1 + i}` : null)).filter(Boolean);
+      ws.getCell(r, 5).value = "예상 수익(신청분)";
+      ws.getCell(r, 6).value = f(`D${end}-(${soldRows.join("+") || 0})`, soldA * (PRICE.saleA - PRICE.costA) + soldI * (PRICE.saleI - PRICE.costI));
       ws.getCell(r, 5).font = { name: FONT, bold: true, size: 10 };
       ws.getCell(r, 6).numFmt = "#,##0";
+      if (bufA || bufI) {
+        r++;
+        ws.mergeCells(r, 1, r, 6);
+        ws.getCell(r, 1).value = `※ 예비 ${bufA + bufI}대는 판매가 아니라 재고(불량 교체·추가 신청용)로, 매입 금액에만 들어갑니다.`;
+        ws.getCell(r, 1).font = { name: FONT, size: 9, color: { argb: "FF5A6472" } };
+      }
       r += 2;
       para("3. 배송 방법", true);
       para(qty >= 500 ? "- 500대 이상으로 제조사 공장에서 영업장 앞 직배송(당사 직원 출장 동행). 출장 일정·경비 포함." : "- 500대 미만으로 당사 입고 후 택배 배송(송장 요청).");
@@ -274,9 +287,17 @@ export function approvalDoc(po, cycle, requests, allOrders, s) {
 
 // ----------------------------------------------------------------- 3. 환불 품의서
 
-export function refundApprovalDoc(month, requests, cycles, shopName, s) {
+export function refundApprovalDoc(month, requests, cycles, shopName, s, cases = []) {
   const monthOf = Object.fromEntries(cycles.map((c) => [c.id, c.month]));
   const list = requests.filter((r) => r.refundDue > 0 && (!month || monthOf[r.cycleId] === month));
+  const CANCEL = ["CANCELLED", "REFUND_PENDING", "REFUNDED"];
+  const returned = (r) => cases.filter((k) => k.type === "RETURN" && k.requestId === r.id);
+  const units = (r, m) => {
+    const back = returned(r).filter((k) => modelOfSerial(k.serial) === m).length;
+    const own = CANCEL.includes(r.status) ? (m === "ANDROID" ? r.androidQty : r.iosQty) : 0;
+    return own + back;
+  };
+  const why = (r) => [r.note, ...returned(r).map((k) => `반품: ${k.reason || ""} (${k.serial})`)].filter(Boolean).join(" / ");
   return [
     (wb) => {
       const ws = wb.addWorksheet("환불 품의서");
@@ -287,8 +308,8 @@ export function refundApprovalDoc(month, requests, cycles, shopName, s) {
       const end = table(
         ws,
         start,
-        ["No", "영업장", "신청자", "안드로이드", "iOS", "환불액(VAT 포함)", "환불 완료", "사유"],
-        list.map((r, i) => [i + 1, shopName[r.shopId] || "", r.applicantName, r.androidQty, r.iosQty, r.refundDue, r.refundedTotal, r.note || ""]),
+        ["No", "영업장", "신청자", "환불 대상 안드로이드", "환불 대상 iOS", "환불액(VAT 포함)", "환불 완료", "사유"],
+        list.map((r, i) => [i + 1, shopName[r.shopId] || "", r.applicantName, units(r, "ANDROID"), units(r, "IOS"), r.refundDue, r.refundedTotal, why(r)]),
         { sumCols: [6, 7], sumLabelCol: 2 },
       );
       note(ws, end + 2, 8, "2. 처리 계획: 환불 계좌 확인 후 이체, 반품 기기는 재고로 돌려 다음 신청분에 사용. 계산서가 이미 발행된 건은 해당 월 계산서에서 조정합니다.\n3. 첨부: 환불 계좌 사본(별도)");
@@ -409,19 +430,33 @@ export function invoiceListDoc(cycle, requests, shops, invoices) {
       );
 
       const ws2 = wb.addWorksheet(`${cycle.month} 개인 계산서 발행`);
-      widths(ws2, [5, 16, 12, 10, 8, 14, 12, 14, 12, 12, 12]);
-      const personal = live.filter((r) => r.personalAmount > 0);
-      title(ws2, `${cycle.month} 발주분 개인(카운슬러) 앞 계산서 발행분`, 11, `총 ${personal.reduce((n, r) => n + r.androidQty + r.iosQty, 0)}대 · 금액은 공급가액, 합계는 VAT 포함`);
+      widths(ws2, [5, 16, 12, 10, 8, 14, 12, 14, 12, 12, 12, 40]);
+      // 이미 요청·발행된 계산서는 나중에 반품·환불이 있어도 빠지지 않게 계산서 기준으로 싣고,
+      // 아직 요청하지 않은 배송 완료 건을 덧붙입니다.
+      const reqBy = Object.fromEntries(requests.map((r) => [r.id, r]));
+      const issued = invoices.filter((x) => x.type === "PERSONAL" && x.cycleId === cycle.id && reqBy[x.requestId]);
+      const rowsP = [
+        ...issued.map((x) => ({ r: reqBy[x.requestId], amount: x.amount, inv: x })),
+        ...live.filter((r) => r.personalAmount > 0 && !invOf[r.id]).map((r) => ({ r, amount: r.personalAmount, inv: null })),
+      ];
+      const fix = (row) => {
+        const refund = row.r.refundDue || 0;
+        if (!refund || !row.inv || row.inv.status === "REQUESTED") return "";
+        return `환불 ${refund.toLocaleString("ko-KR")}원 → 수정세금계산서(공급가액 -${Math.round(refund / 1.1).toLocaleString("ko-KR")}원) 발행 필요`;
+      };
+      const needFix = rowsP.filter((x) => fix(x)).length;
+      title(ws2, `${cycle.month} 발주분 개인(카운슬러) 앞 계산서 발행분`, 12, `계산서 ${rowsP.length}장 · 금액은 공급가액, 합계는 VAT 포함${needFix ? ` · 수정 발행 필요 ${needFix}건` : ""}`);
       const s2 = 4;
       table(
         ws2,
         s2,
-        ["No", "영업장", "신청자", "안드로이드", "아이폰", "공급가액", "VAT", "합계", "입금일", "배송 완료", "계산서"],
-        personal.map((r, i) => {
+        ["No", "영업장", "신청자", "안드로이드", "아이폰", "공급가액", "VAT", "합계", "입금일", "배송 완료", "계산서", "수정 발행"],
+        rowsP.map((x, i) => {
           const n = s2 + 1 + i;
-          return [i + 1, shopBy[r.shopId]?.name || "", r.applicantName, r.androidQty, r.iosQty, r.personalAmount, f(`ROUND(F${n}*0.1,0)`, Math.round(r.personalAmount * 0.1)), f(`F${n}+G${n}`, Math.round(r.personalAmount * 1.1)), ymd(r.paidOn), ymd(r.deliveredOn), invKo(invOf[r.id]?.status)];
+          const r = x.r;
+          return [i + 1, shopBy[r.shopId]?.name || "", r.applicantName, r.androidQty, r.iosQty, x.amount, f(`ROUND(F${n}*0.1,0)`, Math.round(x.amount * 0.1)), f(`F${n}+G${n}`, Math.round(x.amount * 1.1)), ymd(r.paidOn), ymd(r.deliveredOn), x.inv ? invKo(x.inv.status) : "요청 전", fix(x)];
         }),
-        { sumCols: [4, 5, 6, 7, 8], sumLabelCol: 2 },
+        { sumCols: [6, 7, 8], sumLabelCol: 2 },
       );
     },
     `세금계산서_발행리스트_${cycle.month}.xlsx`,
@@ -509,15 +544,21 @@ export function profitReportDoc(orders, requests, invoices, s) {
   return [
     (wb) => {
       const ws = wb.addWorksheet("수익현황");
-      widths(ws, [8, 16, 10, 10, 14, 14, 14, 14, 14, 10]);
-      title(ws, `${s.customer} 모바일 프린터기 수익현황`, 10, `작성 ${todayStr()} · VAT 별도 · 대당 수익 안드로이드 13,000 / iOS 13,000`);
+      widths(ws, [8, 16, 10, 10, 10, 14, 14, 14, 14, 14, 14, 10]);
+      title(ws, `${s.customer} 모바일 프린터기 수익현황`, 12, `작성 ${todayStr()} · VAT 별도 · 매출·매입은 판매(신청) 대수 기준, 예비 수량은 재고 매입으로 따로 표시`);
       const start = 4;
+      const CANCEL = ["CANCELLED", "CANCELLED_UNPAID", "REFUND_PENDING", "REFUNDED"];
       const end = table(
         ws,
         start,
-        ["차수", "발주번호", "안드로이드", "iOS", "매출", "매입", "수익", "본사 발행일", "영업장 발행", "입금 완료"],
+        ["차수", "발주번호", "발주 대수", "판매 안드로이드", "판매 iOS", "매출", "매입(판매분)", "수익", "예비·재고 매입", "본사 발행일", "영업장 발행", "입금 완료"],
         sorted.map((o, i) => {
           const n = start + 1 + i;
+          const sold = requests.filter((r) => r.purchaseOrderId === o.id && !CANCEL.includes(r.status));
+          const sa = sold.reduce((t, r) => t + r.androidQty, 0);
+          const si = sold.reduce((t, r) => t + r.iosQty, 0);
+          const revenue = sold.reduce((t, r) => t + r.personalAmount + r.hqAmount, 0);
+          const spare = (o.androidQty - sa) * PRICE.costA + (o.iosQty - si) * PRICE.costI;
           const reqs = requests.filter((r) => r.cycleId === o.cycleId && r.deliveredOn);
           const hq = invoices.find((x) => x.type === "HQ" && x.cycleId === o.cycleId);
           const pInv = invoices.filter((x) => x.type === "PERSONAL" && x.cycleId === o.cycleId);
@@ -525,19 +566,21 @@ export function profitReportDoc(orders, requests, invoices, s) {
           return [
             `${i + 1}차`,
             o.orderNo,
-            o.androidQty,
-            o.iosQty,
-            f(`C${n}*${PRICE.saleA}+D${n}*${PRICE.saleI}`, o.androidQty * PRICE.saleA + o.iosQty * PRICE.saleI),
-            f(`C${n}*${PRICE.costA}+D${n}*${PRICE.costI}`, o.androidQty * PRICE.costA + o.iosQty * PRICE.costI),
-            f(`E${n}-F${n}`, o.androidQty * (PRICE.saleA - PRICE.costA) + o.iosQty * (PRICE.saleI - PRICE.costI)),
+            o.androidQty + o.iosQty,
+            sa,
+            si,
+            revenue,
+            f(`D${n}*${PRICE.costA}+E${n}*${PRICE.costI}`, sa * PRICE.costA + si * PRICE.costI),
+            f(`F${n}-G${n}`, revenue - sa * PRICE.costA - si * PRICE.costI),
+            spare,
             hq?.issuedOn || "",
             reqs.length === 0 ? "" : allIssued ? "전체 발행완료" : "발행 중",
             hq ? (hq.status === "PAID" ? "O" : "X") : "-",
           ];
         }),
-        { sumCols: [3, 4, 5, 6, 7], sumLabelCol: 2 },
+        { sumCols: [3, 4, 5, 6, 7, 8, 9], sumLabelCol: 2 },
       );
-      note(ws, end + 2, 10, "· 매출은 발주 수량(예비 포함) 기준입니다. 실제 배송·반품 반영 수치는 대시보드의 기간별 현황을 참고하세요.");
+      note(ws, end + 2, 12, "· 판매 대수·매출은 그 발주로 나간 신청 중 취소·반품을 뺀 현재 기준입니다. 예비·재고 매입은 아직 팔리지 않은 기기(예비·반품 복귀분)의 매입액입니다.");
     },
     `수익보고_${todayStr()}.xlsx`,
   ];
@@ -556,8 +599,8 @@ export function receivablesDoc(invoices, requests, shops, cycles, overdueDays = 
   return [
     (wb) => {
       const ws = wb.addWorksheet("미수금 보고서");
-      widths(ws, [6, 22, 14, 14, 12, 12, 30]);
-      title(ws, "모바일 프린터기 미수금 현황", 7, `${today} 기준 · 기한 = 계산서 발행 후 ${overdueDays}일`);
+      widths(ws, [6, 22, 14, 16, 16, 12, 12, 30]);
+      title(ws, "모바일 프린터기 미수금 현황", 8, `${today} 기준 · 기한 = 계산서 발행 후 ${overdueDays}일`);
       const section = (row, text) => {
         ws.getCell(row, 1).value = text;
         ws.getCell(row, 1).font = { name: FONT, bold: true, size: 11, color: { argb: NAVY } };
@@ -566,9 +609,9 @@ export function receivablesDoc(invoices, requests, shops, cycles, overdueDays = 
       let end = table(
         ws,
         4,
-        ["No", "구분", "발행일", "금액(VAT 별도)", "경과일", "기한 초과", "대상 월"],
-        hq.map((x, i) => [i + 1, "본사 앞 계산서", x.issuedOn, x.amount, days(x.issuedOn), days(x.issuedOn) > overdueDays ? "초과" : "", monthOf[x.cycleId] || ""]),
-        { sumCols: [4], sumLabelCol: 2 },
+        ["No", "구분", "발행일", "공급가액", "받을 돈(VAT 포함)", "경과일", "기한 초과", "대상 월"],
+        hq.map((x, i) => [i + 1, "본사 앞 계산서", x.issuedOn, x.amount, f(`ROUND(D${5 + i}*1.1,0)`, Math.round(x.amount * 1.1)), days(x.issuedOn), days(x.issuedOn) > overdueDays ? "초과" : "", monthOf[x.cycleId] || ""]),
+        { sumCols: [4, 5], sumLabelCol: 2 },
       );
       section(end + 2, "2. 입금 대기 신청 (마감 시 자동 취소)");
       end = table(

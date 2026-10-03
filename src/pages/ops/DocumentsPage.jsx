@@ -127,7 +127,7 @@ export default function DocumentsPage() {
       pick: "po",
       docs: [
         ["발주서", "제조사 메일 첨부", "발주 No., 품목(안드로이드·아이폰), 단가 130,000/160,000, 수량, 금액, 박스 구성까지 채워집니다.", () => purchaseOrderDoc(po, settings), !po],
-        ["품의서", "그룹웨어 상신", "N차 납품 개요, Order Number, 수량·판매/매입 금액·예상 수익, 배송 방법(500대 이상 직배송), 일정. 발주서 시트 포함.", () => approvalDoc(po, data.cycles.find((c) => c.id === po.cycleId), data.requests, data.orders, settings), !po],
+        ["품의서", "그룹웨어 상신", "N차 납품 개요, Order Number, 신청분 판매/매입 금액·예상 수익, 예비 수량(재고), 배송 방법(500대 이상 직배송), 일정. 발주서 시트 포함.", () => approvalDoc(po, data.cycles.find((c) => c.id === po.cycleId), data.requests, data.orders, settings), !po],
         ["시리얼 출고 리스트", "고객사 본사 제출", "발주별 안드로이드·iOS 시트에 시리얼, 배송 영업장, 배송일을 정리합니다(바코드로 찍은 그대로).", () => serialListDoc(po, data.devices, data.requests, data.shops), !po],
       ],
     },
@@ -143,9 +143,9 @@ export default function DocumentsPage() {
       title: "계산서·수금 (다음 달 10일 전후)",
       pick: "cycle",
       docs: [
-        ["세금계산서 발행리스트", "경영지원팀·고객사 공유", "본사 앞(직영·iOS 차액·리리코스) 시트와 개인(카운슬러) 앞 시트. 공급가액·VAT·합계 수식 포함.", () => invoiceListDoc(cycle, data.requests, data.shops, data.invoices), !cycle],
-        ["환불 품의서", "그룹웨어 상신", "선택한 월의 취소·반품·기종 변경으로 생긴 환불 대상과 금액(VAT 포함).", () => refundApprovalDoc(cycle?.month, data.requests, data.cycles, shopName, settings), !cycle],
-        ["미수금 보고서", "영업 대표 보고", "본사 앞 미수(경과일·기한 초과), 입금 대기 신청, 환불할 돈을 한 장에.", () => receivablesDoc(data.invoices, data.requests, data.shops, data.cycles), false],
+        ["세금계산서 발행리스트", "경영지원팀·고객사 공유", "본사 앞(직영·iOS 차액·리리코스) 시트와 개인(카운슬러) 앞 시트. 발행 후 반품·환불된 건은 수정세금계산서 발행 필요로 표시.", () => invoiceListDoc(cycle, data.requests, data.shops, data.invoices), !cycle],
+        ["환불 품의서", "그룹웨어 상신", "선택한 월의 취소·반품·기종 변경으로 생긴 환불 대상과 금액(VAT 포함).", () => refundApprovalDoc(cycle?.month, data.requests, data.cycles, shopName, settings, data.cases), !cycle],
+        ["미수금 보고서", "영업 대표 보고", "본사 앞 미수(공급가액·VAT 포함·경과일), 입금 대기 신청, 환불할 돈을 한 장에.", () => receivablesDoc(data.invoices, data.requests, data.shops, data.cycles), false],
       ],
     },
     {
@@ -154,7 +154,7 @@ export default function DocumentsPage() {
       docs: [
         ["출고현황", "회계팀 보고", "월별 발주·배송·반품을 안드로이드·아이폰으로 나눠 집계합니다.", () => shipmentStatusDoc(year, data.orders, data.requests, data.cases, data.devices), false],
         ["거래처별 월별 주문수량", "고객사 본사 제출", "영업장마다 월별 대수와 기종별 합계. 폐쇄 영업장도 상태와 함께 남습니다.", () => monthlyOrdersDoc(year, data.requests, data.shops, data.cycles), false],
-        ["수익보고", "임원 보고", "발주 차수별 수량·매출·매입·수익과 계산서 발행·입금 여부.", () => profitReportDoc(data.orders, data.requests, data.invoices, settings), !data.orders.length],
+        ["수익보고", "임원 보고", "발주 차수별 판매 대수·매출·매입·수익(예비 수량은 재고 매입으로 분리)과 계산서 발행·입금 여부.", () => profitReportDoc(data.orders, data.requests, data.invoices, settings), !data.orders.length],
         ["AS 요청현황", "제조사 서비스센터 공유", "월별 요청·완료·수리불가·미처리 요약과 접수 목록.", () => asReportDoc(year, data.cases, data.shops), false],
       ],
     },

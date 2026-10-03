@@ -61,9 +61,36 @@ export default function DevicesPage() {
     .filter((d) => !q || d.serial.includes(q) || (shopName[d.shopId] || "").includes(query.trim()));
 
   function deviceButtons(d) {
-    if (d.status !== "DELIVERED") return null;
     const who = `${d.serial} · ${shopName[d.shopId] || ""} ${applicant[d.requestId] || ""}`;
     const path = `/printer/devices/${encodeURIComponent(d.serial)}`;
+    if (d.status === "SCRAPPED" && needsReplacement(d)) {
+      return (
+        <Button
+          size="small"
+          variant="contained"
+          color="warning"
+          onClick={() =>
+            ask(
+              {
+                title: "수리 불가 기기 교체 발송 (동작 19)",
+                description: `${who}. 수리할 수 없다는 결과가 온 기기입니다. 같은 기종 재고를 고객에게 보냅니다(폐기 기기는 회수할 필요 없음).`,
+                fields: [
+                  { name: "reason", label: "사유", default: "수리 불가로 교체" },
+                  { name: "newSerial", label: "보낼 시리얼(비우면 자동)" },
+                  dateField("발송일"),
+                ],
+                submitLabel: "교체 발송",
+              },
+              (v) => ops.act(`${path}/exchange`, v),
+              "교체 기기를 보냈습니다.",
+            )
+          }
+        >
+          교체 발송
+        </Button>
+      );
+    }
+    if (d.status !== "DELIVERED") return null;
     return (
       <Stack direction="row" spacing={0.5}>
         <Button
@@ -123,6 +150,11 @@ export default function DevicesPage() {
         </Button>
       </Stack>
     );
+  }
+
+  function needsReplacement(d) {
+    const mine = data.cases.filter((k) => k.deviceId === d.id);
+    return Boolean(d.requestId) && mine.some((k) => k.type === "REPAIR" && k.status === "UNREPAIRABLE") && !mine.some((k) => k.type === "EXCHANGE");
   }
 
   function caseButtons(k) {
