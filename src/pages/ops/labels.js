@@ -40,8 +40,19 @@ export const INVOICE_STATUS = {
   PAID: ["수금 완료", "success"],
 };
 export const MODEL = { ANDROID: "안드로이드", IOS: "iOS" };
-export const SHOP_TYPE = { SPECIALTY: "특약점", DIRECT: "직영 영업소" };
+export const SHOP_TYPE = { SPECIALTY: "방판 특약점", DIRECT: "방판 직영 영업소", LIRICOS: "리리코스 지사" };
 
 export const won = (n) => `${Number(n || 0).toLocaleString("ko-KR")}원`;
 export const today = () => new Date().toLocaleDateString("sv-SE"); // YYYY-MM-DD (로컬 시간)
 export const thisMonth = () => today().slice(0, 7);
+
+/** 개인 입금은 VAT 포함으로 받습니다(143,000 → 157,300). */
+export const withVat = (n) => Math.round((Number(n) || 0) * 1.1);
+
+/** 시리얼 앞자리로 기종 판별 (AMR70KA·AMB7VKA는 예전 라벨 표기) */
+export function modelOfSerial(serial) {
+  const s = (serial || "").trim().toUpperCase();
+  if (s.startsWith("AMR7OKA") || s.startsWith("AMR70KA")) return "ANDROID";
+  if (s.startsWith("AMR7VKA") || s.startsWith("AMB7VKA")) return "IOS";
+  return null;
+}

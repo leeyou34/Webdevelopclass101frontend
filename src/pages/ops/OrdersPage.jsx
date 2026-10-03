@@ -21,7 +21,7 @@ import { ops } from "../../api.js";
 
 /** 할 일에서 눌러 넘어온 줄 표시 */
 const FOCUS = { "&.Mui-selected, &.Mui-selected:hover": { bgcolor: "#fff1e8", boxShadow: "inset 4px 0 0 #eb6834" } };
-import { INVOICE_STATUS, INVOICE_TYPE, REQUEST_STATUS, today, thisMonth, won } from "./labels.js";
+import { INVOICE_STATUS, INVOICE_TYPE, REQUEST_STATUS, today, thisMonth, withVat, won } from "./labels.js";
 import ActionDialog from "./ActionDialog.jsx";
 import StatusChip from "./StatusChip.jsx";
 import Notice from "./Notice.jsx";
@@ -273,9 +273,9 @@ export default function OrdersPage() {
                 title: `${r.personalAmount > 0 ? "입금 확인" : "접수 확인"} (동작 3)`,
                 description:
                   r.personalAmount > 0
-                    ? `${who} · 받아야 할 금액 ${won(r.personalAmount)}. 금액이 다르면 처리되지 않습니다.`
+                    ? `${who} · 받을 금액 ${won(withVat(r.personalAmount))} (공급가 ${won(r.personalAmount)} + VAT). 금액이 다르면 처리되지 않습니다. 통장 내역이 많으면 "입금 대조" 화면에 붙여 넣으세요.`
                     : `${who} · 직영 영업소는 개인 입금 없이 본사로 청구합니다. 확인하지 않으면 마감 때 취소됩니다.`,
-                fields: [{ name: "amount", label: "입금액", type: "number", default: r.personalAmount }, dateField("입금일")],
+                fields: [{ name: "amount", label: "입금액(VAT 포함)", type: "number", default: withVat(r.personalAmount) }, dateField("입금일")],
                 submitLabel: "확인",
               },
               (v) => ops.act(`${path}/payment`, v),
@@ -548,7 +548,7 @@ export default function OrdersPage() {
                     <TableCell>신청자</TableCell>
                     <TableCell align="right">안드로이드</TableCell>
                     <TableCell align="right">iOS</TableCell>
-                    <TableCell align="right">개인 입금</TableCell>
+                    <TableCell align="right">개인 부담</TableCell>
                     <TableCell align="right">본사 청구</TableCell>
                     <TableCell>상태</TableCell>
                     <TableCell>송장</TableCell>

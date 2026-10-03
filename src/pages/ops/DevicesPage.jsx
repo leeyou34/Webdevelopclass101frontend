@@ -31,7 +31,8 @@ const dateField = (label) => ({ name: "date", label, type: "date", default: toda
 
 export default function DevicesPage() {
   const [filter, setFilter] = useState("");
-  const [query, setQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get("q") || "");
   const { data, error, reload } = useLoad(async () => {
     const [devices, cases, shops, requests] = await Promise.all([ops.devices(), ops.cases(), ops.shops(), ops.requests()]);
     return { devices, cases, shops, requests };

@@ -79,10 +79,16 @@ function fakeOps() {
       ];
       return json(200, { shops: 1 });
     }
+    if (method === "POST" && pathname === "/printer/chat") {
+      const m = body.message;
+      if (m === "도움말") return json(200, { answer: "모바일 프린터 운영 업무만 답하는 안내 챗봇입니다.", links: [], suggestions: ["재고 몇 대야?"] });
+      if (m.includes("재고")) return json(200, { answer: "재고는 3대입니다(안드로이드 2 · iOS 1).", links: [{ label: "기기 화면", path: "/ops/devices" }], suggestions: [] });
+      return json(200, { answer: "질문을 업무 항목과 연결하지 못했습니다.", links: [], suggestions: [] });
+    }
     const pay = pathname.match(/^\/printer\/requests\/(\w+)\/payment$/);
     if (method === "POST" && pay) {
       const r = state.requests.find((x) => x.id === pay[1]);
-      if (body.amount !== r.personalAmount) return json(400, { error: "입금액이 신청 금액과 다릅니다." });
+      if (body.amount !== Math.round(r.personalAmount * 1.1)) return json(400, { error: "입금액이 신청 금액과 다릅니다." });
       r.status = "PAID";
       return json(200, r);
     }
@@ -154,7 +160,7 @@ describe("모바일 프린터 운영관리", () => {
     await user.click(within(row).getByRole("button", { name: "입금 확인" }));
 
     const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).getByLabelText("입금액")).toHaveValue(143000);
+    expect(within(dialog).getByLabelText("입금액(VAT 포함)")).toHaveValue(157300);
     await user.click(within(dialog).getByRole("button", { name: "확인" }));
 
     await waitFor(() => expect(within(screen.getByText("서0윤").closest("tr")).getByText("입금 확인")).toBeInTheDocument());
@@ -169,12 +175,24 @@ describe("모바일 프린터 운영관리", () => {
     const row = (await screen.findByText("서0윤")).closest("tr");
     await user.click(within(row).getByRole("button", { name: "입금 확인" }));
     const dialog = await screen.findByRole("dialog");
-    const amount = within(dialog).getByLabelText("입금액");
+    const amount = within(dialog).getByLabelText("입금액(VAT 포함)");
     await user.clear(amount);
     await user.type(amount, "100000");
     await user.click(within(dialog).getByRole("button", { name: "확인" }));
 
     expect(await screen.findByText("입금액이 신청 금액과 다릅니다.")).toBeInTheDocument();
     expect(within(screen.getByText("서0윤").closest("tr")).getByText("신청")).toBeInTheDocument();
+  });
+
+  it("업무 챗봇에 물으면 데이터로 답하고, 링크를 누르면 해당 화면으로 간다", async () => {
+    const user = userEvent.setup();
+    await backend.fetch("/printer/demo", { method: "POST", headers: { Authorization: "Bearer good-token" } });
+    renderAt("/ops");
+    await user.click(await screen.findByRole("button", { name: "업무 챗봇 열기" }));
+    expect(await screen.findByText(/운영 업무만 답하는/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "재고 몇 대야?" }));
+    expect(await screen.findByText(/재고는 3대입니다/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "기기 화면" }));
+    expect(await screen.findByLabelText("시리얼·영업장 검색")).toBeInTheDocument();
   });
 });

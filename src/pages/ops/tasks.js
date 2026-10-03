@@ -2,6 +2,7 @@
 export function taskLink(t) {
   if (t.page === "devices") return `/ops/devices${t.focusId ? `?focus=${t.focusId}` : ""}`;
   if (t.page === "report") return `/ops/report${t.month ? `?month=${t.month}` : ""}`;
+  if (t.page === "deposits") return "/ops/deposits";
   const p = new URLSearchParams();
   if (t.cycleId) p.set("cycle", t.cycleId);
   if (t.focusId) p.set("focus", t.focusId);

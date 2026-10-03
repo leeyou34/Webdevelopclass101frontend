@@ -18,6 +18,7 @@ import { signout, todoApi } from "../api.js";
 import AddTodo from "../components/AddTodo.jsx";
 import TodoItem from "../components/TodoItem.jsx";
 import OpsTasksPanel from "./ops/OpsTasksPanel.jsx";
+import ChatWidget from "./ops/ChatWidget.jsx";
 
 export default function TodoPage() {
   const navigate = useNavigate();
@@ -119,6 +120,7 @@ export default function TodoPage() {
           )}
         </Stack>
       </Container>
+      <ChatWidget />
     </>
   );
 }

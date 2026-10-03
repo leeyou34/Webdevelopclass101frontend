@@ -2,11 +2,15 @@ import { Outlet, useLocation, useNavigate } from "react-router";
 import { AppBar, Box, Button, Container, Tab, Tabs, Toolbar, Typography } from "@mui/material";
 import { HOME_LABEL, HOME_URL } from "../../homeLink.js";
 import { signout } from "../../api.js";
+import ChatWidget from "./ChatWidget.jsx";
 
 const TABS = [
   ["/ops", "대시보드"],
   ["/ops/orders", "신청·발주·계산서"],
+  ["/ops/deposits", "입금 대조"],
+  ["/ops/scan", "바코드 스캔"],
   ["/ops/devices", "기기·사후 처리"],
+  ["/ops/documents", "문서 출력"],
   ["/ops/report", "월 마감"],
   ["/ops/shops", "영업장"],
   ["/ops/activity", "작업 기록"],
@@ -61,6 +65,7 @@ export default function OpsLayout() {
           <Outlet />
         </Box>
       </Container>
+      <ChatWidget />
     </>
   );
 }

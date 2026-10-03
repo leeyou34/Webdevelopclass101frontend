@@ -12,6 +12,9 @@ import DevicesPage from "./pages/ops/DevicesPage.jsx";
 import ReportPage from "./pages/ops/ReportPage.jsx";
 import ShopsPage from "./pages/ops/ShopsPage.jsx";
 import ActivityPage from "./pages/ops/ActivityPage.jsx";
+import ScanPage from "./pages/ops/ScanPage.jsx";
+import DepositsPage from "./pages/ops/DepositsPage.jsx";
+import DocumentsPage from "./pages/ops/DocumentsPage.jsx";
 
 function RequireLogin({ children }) {
   return getToken() ? children : <Navigate to="/login" replace />;
@@ -52,6 +55,9 @@ export default function App() {
             <Route path="report" element={<ReportPage />} />
             <Route path="shops" element={<ShopsPage />} />
             <Route path="activity" element={<ActivityPage />} />
+            <Route path="scan" element={<ScanPage />} />
+            <Route path="deposits" element={<DepositsPage />} />
+            <Route path="documents" element={<DocumentsPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

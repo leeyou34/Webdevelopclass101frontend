@@ -125,6 +125,10 @@ export const ops = {
   report: (month) => call(`/printer/reports/monthly${q({ month })}`),
   demo: () => call("/printer/demo", "POST", {}),
   createShop: (body) => call("/printer/shops", "POST", body),
+  updateShop: (id, body) => call(`/printer/shops/${id}`, "PUT", body),
+  deposits: () => call("/printer/deposits"),
+  lookup: (serial) => call(`/printer/devices/lookup${q({ serial })}`),
+  chat: (message) => call("/printer/chat", "POST", { message }),
   /** 동작 실행: POST path body */
   act: (path, body) => call(path, "POST", body ?? {}),
 };
