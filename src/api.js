@@ -99,3 +99,36 @@ export const todoApi = {
   update: (item) => call("/todo", "PUT", { id: item.id, title: item.title, done: item.done }).then((r) => r.data),
   remove: (item) => call("/todo", "DELETE", { id: item.id }).then((r) => r.data),
 };
+
+/** 모바일 프린터 운영관리 API. 동작 번호는 기획서 "동작 목록"과 같습니다. */
+const q = (params) => {
+  const s = Object.entries(params)
+    .filter(([, v]) => v !== undefined && v !== null && v !== "")
+    .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+    .join("&");
+  return s ? `?${s}` : "";
+};
+
+export const ops = {
+  dashboard: (asOf) => call(`/printer/dashboard${q({ asOf })}`),
+  analytics: (from, to) => call(`/printer/analytics${q({ from, to })}`),
+  tasks: (asOf) => call(`/printer/tasks${q({ asOf })}`),
+  shops: () => call("/printer/shops"),
+  cycles: () => call("/printer/cycles"),
+  requests: (cycleId) => call(`/printer/requests${q({ cycleId })}`),
+  purchaseOrders: () => call("/printer/purchase-orders"),
+  devices: (status) => call(`/printer/devices${q({ status })}`),
+  cases: () => call("/printer/cases"),
+  invoices: () => call("/printer/invoices"),
+  adjustments: () => call("/printer/adjustments"),
+  activity: () => call("/printer/activity"),
+  report: (month) => call(`/printer/reports/monthly${q({ month })}`),
+  demo: () => call("/printer/demo", "POST", {}),
+  createShop: (body) => call("/printer/shops", "POST", body),
+  updateShop: (id, body) => call(`/printer/shops/${id}`, "PUT", body),
+  deposits: () => call("/printer/deposits"),
+  lookup: (serial) => call(`/printer/devices/lookup${q({ serial })}`),
+  chat: (message) => call("/printer/chat", "POST", { message }),
+  /** 동작 실행: POST path body */
+  act: (path, body) => call(path, "POST", body ?? {}),
+};

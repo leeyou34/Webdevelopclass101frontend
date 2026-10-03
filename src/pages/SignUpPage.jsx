@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router";
+import { Link as RouterLink, useNavigate, useSearchParams } from "react-router";
 import { Button, Link, TextField, Typography } from "@mui/material";
 import { signup } from "../api.js";
 import AuthCard from "../components/AuthCard.jsx";
@@ -8,7 +8,8 @@ const EMPTY = { username: "", email: "", password: "", inviteCode: "" };
 
 export default function SignUpPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState(EMPTY);
+  const [params] = useSearchParams();
+  const [form, setForm] = useState({ ...EMPTY, inviteCode: params.get("invite") || "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 

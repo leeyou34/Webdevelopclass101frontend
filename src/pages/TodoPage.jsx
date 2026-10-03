@@ -13,9 +13,12 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
+import { HOME_LABEL, HOME_URL } from "../homeLink.js";
 import { signout, todoApi } from "../api.js";
 import AddTodo from "../components/AddTodo.jsx";
 import TodoItem from "../components/TodoItem.jsx";
+import OpsTasksPanel from "./ops/OpsTasksPanel.jsx";
+import ChatWidget from "./ops/ChatWidget.jsx";
 
 export default function TodoPage() {
   const navigate = useNavigate();
@@ -65,6 +68,14 @@ export default function TodoPage() {
           <Typography variant="h6" component="h1" sx={{ flexGrow: 1, fontWeight: 700 }}>
             오늘의 할 일
           </Typography>
+          {HOME_URL && (
+            <Button color="inherit" href={HOME_URL}>
+              {HOME_LABEL}
+            </Button>
+          )}
+          <Button color="inherit" onClick={() => navigate("/ops")}>
+            운영관리
+          </Button>
           <Button color="inherit" onClick={handleSignout}>
             로그아웃
           </Button>
@@ -73,6 +84,11 @@ export default function TodoPage() {
 
       <Container maxWidth="md" sx={{ py: 4 }}>
         <Stack spacing={2}>
+          <OpsTasksPanel />
+
+          <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, pt: 1 }}>
+            내 할 일
+          </Typography>
           <AddTodo onAdd={(title) => run(() => todoApi.create(title))} disabled={busy} />
 
           {error && (
@@ -104,6 +120,7 @@ export default function TodoPage() {
           )}
         </Stack>
       </Container>
+      <ChatWidget />
     </>
   );
 }
